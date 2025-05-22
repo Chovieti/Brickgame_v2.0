@@ -24,6 +24,8 @@ protected:
     // Переопределяем метод рисования виджета
     void paintEvent(QPaintEvent *) override {
         if (!game_info.field || !game_info.next) return;
+        static double speed = 0.0;
+        if (game_info.speed > 0) speed = 100 / (120.0  - game_info.speed);
         QPainter painter(this);  // Создаем объект для рисования
         // Заливает весь фон черным
         painter.fillRect(rect(), Qt::black);
@@ -44,9 +46,8 @@ protected:
             }
         }
         // Игровая статистика
-        int test_number = 82128;
         painter.setFont(QFont("Verdana", 18));
-        painter.drawText(230, 200, QString("Speed: %1").arg(game_info.speed));
+        painter.drawText(230, 200, QString("Speed: %1").arg(speed, 0 , 'f', 4));
         painter.drawText(230, 236, QString("Level: %1").arg(game_info.level));
         painter.drawText(230, 272, QString("Score: %1").arg(game_info.score));
         painter.drawText(230, 308, QString("High: %1").arg(game_info.high_score));
@@ -60,6 +61,17 @@ protected:
                 // 140 отступ по X, 35 отступ по Y, 15 размер пикселя поля NEXT
                 if (game_info.field[y][x]) painter.fillRect((x * 20) + 10, (y * 20) + 10, 20, 20, Qt::white);
             }
+        }
+        // Экран старта и позора
+        if (game_info.speed == 0) {
+            painter.drawText(65, 210, QString("Press Enter"));
+        } else if (game_info.speed < 0) {
+            painter.fillRect(30, 110, 160, 200, Qt::black);
+            painter.drawRect(30, 110, 160, 200);
+            // painter.setPen(QPen(Qt::white, 2));
+            painter.drawText(70, 160, QString("You Lose"));
+            painter.drawText(60, 200, QString("Your Score"));
+            painter.drawText(65, 240, QString("%1").arg(game_info.score, 8));
         }
 
     }

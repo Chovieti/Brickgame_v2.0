@@ -187,7 +187,7 @@ void drawStatField(GameInfo_t game_info) {
   else if (game_info.speed == -1)
     snprintf(buffer, sizeof(buffer), "Speed: %.4lf", speed);
   else {
-    speed = 100 / (120.0 - (game_info.speed * game_info.level));
+    speed = 100 / (120.0 - game_info.speed);
     snprintf(buffer, sizeof(buffer), "Speed: %.4lf", speed);
   }
   mvaddstr(Y_START_STAT + indent, X_START_STAT, buffer);

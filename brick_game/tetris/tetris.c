@@ -43,7 +43,7 @@ GameInfo_t *getGameInfo_t(bool switch_flag) {
       game_info.pause = 0;
     }
     double elapsed_time = getTimeDifference(start_time, current_time);
-    if (((elapsed_time >= (120 - (game_info.speed * game_info.level)) &&
+    if (((elapsed_time >= (120 - game_info.speed) &&
           state_game == Shift) ||
          (state_game != Shift)) &&
         (game_info.pause == 0) && (game_info.speed > 0)) {
@@ -699,8 +699,11 @@ field_fsm fsmAttaching(GameInfo_t *game_info) {
       game_info->score += 1500;
       break;
   }
-  game_info->level = game_info->score / 600 + 1;
-  if (game_info->level > 10) game_info->level = 10;
+  if (count_full_line && game_info->level < 10) {
+    game_info->level = game_info->score / 600 + 1;
+    if (game_info->level > 10) game_info->level = 10;
+    game_info->speed = 10 * game_info->level;
+  }
   return Spawn;
 }
 
