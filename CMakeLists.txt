@@ -21,6 +21,7 @@ add_executable(BrickGameV2.0
     brick_game/tetris/txtscore.c
     brick_game/tetris/lib_spec.c
     gui/cli/user_screen.c
+    gui/desktop/desktop_screen.cpp
 )
 
 add_compile_options(-Wall -Wextra)

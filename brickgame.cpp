@@ -1,21 +1,28 @@
 #include <iostream>
 
+
+// #include <QApplication>
+// #include <QWidget>       // Базовый класс виджетов
+// #include <QPainter>        // Для рисования на виджете
+// #include <QVector> 
+
+
 #include "brickgame.h"
+
 
 int main() {
     int game = 0;
-    do {
-    std::cout << "Выберите игру:\n 1 - тетрис\n 2 - змейка\n 0 - выход" << std::endl;
+    // brickGameDescktop(userInput, updateCurrentState);
+    std::cout << "Выберите игру:\n 1 - тетрис\n 2 - змейка" << std::endl;
     std::cin >> game;
     if (game == 1)
       brickGameConsole(userInput, updateCurrentState);
     else if (game == 2) {
       std::cout << "Змейка ешё не сделана" << std::endl;
-      brickGameDescktop();
+      brickGameDescktop(userInput, updateCurrentState);
     }
-    else if (game != 0)
+    else
       std::cout << "Такого нету" << std::endl;
-    } while(game != 0);
     return 0;
 }
 
@@ -39,6 +46,15 @@ void brickGameConsole(void (*userInput)(UserAction_t, bool), GameInfo_t (*update
   endwin();
 }
 
-void brickGameDescktop() {
-
-}
+// int brickGameDescktop() {
+//   char **argv = nullptr;
+//   int argc = 0;
+//   QApplication app(argc, argv);
+    
+//   // Главное окно
+//   MatrixWidget window;
+//   window.setWindowTitle("Qt Frame Example");
+  
+//   window.show();
+//   return app.exec();
+// }

@@ -1,0 +1,143 @@
+#include <QApplication>
+#include <QWidget>
+#include <QPainter>
+
+#include <QKeyEvent>
+#include <QTimer>
+
+#include "../../brickgame.h"
+
+// Кастомный виджет для отображения матрицы
+class GameWidget : public QWidget {
+    Q_OBJECT
+public:
+    // Конструктор виджета
+    GameWidget(void (*userInput)(UserAction_t, bool), GameInfo_t(*updateCurrentState)(), QWidget *parent = nullptr) : QWidget(parent), userInput(userInput), updateCurrentState(updateCurrentState) {
+        setFocusPolicy(Qt::StrongFocus);
+        connect(&gameTimer, &QTimer::timeout, this, &GameWidget::gameLoop);
+        gameTimer.start(20);
+        game_info.field = nullptr;
+        game_info.next = nullptr;
+    }
+
+protected:
+    // Переопределяем метод рисования виджета
+    void paintEvent(QPaintEvent *) override {
+        if (!game_info.field || !game_info.next) return;
+        QPainter painter(this);  // Создаем объект для рисования
+        // Заливает весь фон черным
+        painter.fillRect(rect(), Qt::black);
+        // Рисует границы игрового поля
+        painter.setPen(QPen(Qt::white, 2)); // Цвет и толщина контура
+        painter.setBrush(Qt::NoBrush); // Отключаем заливку
+        painter.drawRect(10, 10, 200, 400);
+        // Рисует границы игровой статистики
+        painter.drawRect(220, 10, 150, 150);
+        painter.drawRect(220, 160, 150, 250);
+        // Надпись NEXT и следуюшая фигура
+        painter.setFont(QFont("Verdana", 20));
+        painter.drawText(270, 40, "NEXT");
+        for (int y = 0; y < 4; y++) {
+            for (int x = 0; x < 4; x++) {
+                // 140 отступ по X, 35 отступ по Y, 15 размер пикселя поля NEXT
+                if (game_info.next[y][x]) painter.fillRect((x * 20) + 255, (y * 20) + 55, 20, 20, Qt::white);
+            }
+        }
+        // Игровая статистика
+        int test_number = 82128;
+        painter.setFont(QFont("Verdana", 18));
+        painter.drawText(230, 200, QString("Speed: %1").arg(game_info.speed));
+        painter.drawText(230, 236, QString("Level: %1").arg(game_info.level));
+        painter.drawText(230, 272, QString("Score: %1").arg(game_info.score));
+        painter.drawText(230, 308, QString("High: %1").arg(game_info.high_score));
+        if (game_info.pause) {
+            painter.drawText(230, 344, "Pause: ON");
+        } else 
+            painter.drawText(230, 344, "Pause: OFF");
+        // Отрисовка игрового поля
+        for (int y = 0; y < 20; y++) {
+            for (int x = 0; x < 10; x++) {
+                // 140 отступ по X, 35 отступ по Y, 15 размер пикселя поля NEXT
+                if (game_info.field[y][x]) painter.fillRect((x * 20) + 10, (y * 20) + 10, 20, 20, Qt::white);
+            }
+        }
+
+    }
+
+    void keyPressEvent(QKeyEvent* event) override {
+        UserAction_t action;
+        bool hold = false;
+        switch (event->key()) {
+        case Qt::Key_Return:
+            action = Start;
+            hold = true;
+            break;
+        case Qt::Key_P:
+            action = Pause;
+            hold = true;
+            break;
+        case Qt::Key_Q:
+        case Qt::Key_Escape:
+            action = Terminate;
+            hold = true;
+            break;
+        case Qt::Key_A:
+        case Qt::Key_Left:
+            action = Left;
+            hold = true;
+            break;
+        case Qt::Key_D:
+        case Qt::Key_Right:
+            action = Right;
+            hold = true;
+            break;
+        case Qt::Key_W:
+        case Qt::Key_Up:
+            action = Up;
+            hold = true;
+            break;
+        case Qt::Key_S:
+        case Qt::Key_Down:
+            action = Down;
+            hold = true;
+            break;
+        case Qt::Key_Space:
+            action = Action;
+            hold = true;
+            break;
+        }
+        if (hold == true) userInput(action, hold);
+    }
+
+private slots:
+    void gameLoop() {
+        game_info = updateCurrentState();
+        if (!game_info.field || !game_info.next) {
+            gameTimer.stop();
+            this->close();
+            return;
+        }
+        update();
+    }
+
+private:
+    GameInfo_t game_info;
+    QTimer gameTimer;
+    void (*userInput)(UserAction_t, bool);
+    GameInfo_t (*updateCurrentState)();
+};
+
+#include "desktop_screen.moc"
+
+int brickGameDescktop(void (*userInput)(UserAction_t, bool), GameInfo_t (*updateCurrentState)()) {
+  char **argv = nullptr;
+  int argc = 0;
+  QApplication app(argc, argv);
+    
+  // Главное окно
+  GameWidget window(userInput, updateCurrentState);
+  window.setWindowTitle("BrickGameV2.0");
+  window.setFixedSize(380, 420);
+  window.show();
+  return app.exec();
+}

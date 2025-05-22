@@ -9,7 +9,7 @@ extern "C" {
 #include "headers/lib_spec.h"
 
 void brickGameConsole(void (*userInput)(UserAction_t, bool), GameInfo_t (*updateCurrentState)());
-void brickGameDescktop();
+int brickGameDescktop(void (*userInput)(UserAction_t, bool), GameInfo_t (*updateCurrentState)());
 
 #ifdef __cplusplus
 }
