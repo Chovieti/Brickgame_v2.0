@@ -15,7 +15,7 @@ public:
     GameWidget(void (*userInput)(UserAction_t, bool), GameInfo_t(*updateCurrentState)(), QWidget *parent = nullptr) : QWidget(parent), userInput(userInput), updateCurrentState(updateCurrentState) {
         setFocusPolicy(Qt::StrongFocus);
         connect(&gameTimer, &QTimer::timeout, this, &GameWidget::gameLoop);
-        gameTimer.start(20);
+        gameTimer.start(50);
         game_info.field = nullptr;
         game_info.next = nullptr;
     }
@@ -25,7 +25,7 @@ protected:
     void paintEvent(QPaintEvent *) override {
         if (!game_info.field || !game_info.next) return;
         static double speed = 0.0;
-        if (game_info.speed > 0) speed = 100 / (120.0  - game_info.speed);
+        if (game_info.speed > 0 && game_info.speed <= 100) speed = 100 / (120.0  - game_info.speed);
         QPainter painter(this);  // Создаем объект для рисования
         // Заливает весь фон черным
         painter.fillRect(rect(), Qt::black);
@@ -50,7 +50,11 @@ protected:
         painter.drawText(230, 200, QString("Speed: %1").arg(speed, 0 , 'f', 4));
         painter.drawText(230, 236, QString("Level: %1").arg(game_info.level));
         painter.drawText(230, 272, QString("Score: %1").arg(game_info.score));
-        painter.drawText(230, 308, QString("High: %1").arg(game_info.high_score));
+        if (game_info.high_score > game_info.score) {
+            painter.drawText(230, 308, QString("High: %1").arg(game_info.high_score));
+        } else {
+            painter.drawText(230, 308, QString("High: %1").arg(game_info.score));
+        }
         if (game_info.pause) {
             painter.drawText(230, 344, "Pause: ON");
         } else 
@@ -65,7 +69,7 @@ protected:
         // Экран старта и позора
         if (game_info.speed == 0) {
             painter.drawText(65, 210, QString("Press Enter"));
-        } else if (game_info.speed < 0) {
+        } else if (game_info.speed == -1) {
             painter.fillRect(30, 110, 160, 200, Qt::black);
             painter.drawRect(30, 110, 160, 200);
             // painter.setPen(QPen(Qt::white, 2));
@@ -118,7 +122,9 @@ protected:
             hold = true;
             break;
         }
+
         if (hold == true) userInput(action, hold);
+        if (action == Terminate) QApplication::quit();
     }
 
 private slots:

@@ -11,15 +11,24 @@
 
 
 int main() {
-    int game = 0;
-    // brickGameDescktop(userInput, updateCurrentState);
+    int interface = 0, game = 0;
+    // brickGameDescktop(s21::s_io::userInput, s21::s_io::updateCurrentState);
+    std::cout << "Выберите интерфейс:\n 1 - Терминал\n 2 - Приложение" << std::endl;
+    std::cin >> interface;
     std::cout << "Выберите игру:\n 1 - тетрис\n 2 - змейка" << std::endl;
     std::cin >> game;
-    if (game == 1)
+    if (interface != 2 && game == 1) {
       brickGameConsole(userInput, updateCurrentState);
-    else if (game == 2) {
+    }
+    else if (interface == 2 && game == 1) {
       std::cout << "Змейка ешё не сделана" << std::endl;
       brickGameDescktop(userInput, updateCurrentState);
+    }
+    else if (interface == 1 && game == 2) {
+      brickGameConsole(s21::userInput, s21::updateCurrentState);
+    }
+    else if (interface == 2 && game == 2) {
+      brickGameDescktop(s21::userInput, s21::updateCurrentState);
     }
     else
       std::cout << "Такого нету" << std::endl;
