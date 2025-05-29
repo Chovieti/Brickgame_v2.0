@@ -5,7 +5,7 @@
  * @param new_score Новый рекорд который будет сохранен.
  */
 void saveScore(int new_score) {
-  FILE *score_file = fopen("score.txt", "w");
+  FILE *score_file = fopen("tetris_score.txt", "w");
   fprintf(score_file, "%d", new_score);
   fclose(score_file);
 }
@@ -17,9 +17,9 @@ void saveScore(int new_score) {
 int readScore() {
   int high_score = 0;
   char buffer[15] = {0};
-  FILE *score_file = fopen("score.txt", "r");
+  FILE *score_file = fopen("tetris_score.txt", "r");
   if (score_file == NULL) {
-    score_file = fopen("score.txt", "w");
+    score_file = fopen("tetris_score.txt", "w");
     if (score_file == NULL) {
       high_score = -1;
     } else {

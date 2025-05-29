@@ -5,10 +5,9 @@
 extern "C" {
 #endif
 
-#include "lib_spec.h"
-
 #include <ncurses.h>
 
+#include "lib_spec.h"
 
 /**
  * @brief Отступ всех полей от края экрана.

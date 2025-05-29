@@ -36,51 +36,42 @@ void setupNcurses() {
 // void readInput() {
 UserAction_t readInput() {
   UserAction_t user_action = -1;
-  bool hold = false;
   int input = getch();
   switch (input) {
     case '\n':
       user_action = Start;
-      hold = true;
       break;
     case 'P':
     case 'p':
       user_action = Pause;
-      hold = true;
       break;
     case 'q':
     case 'Q':
     case 27:
       user_action = Terminate;
-      hold = true;
       break;
     case 'A':
     case 'a':
     case KEY_LEFT:
       user_action = Left;
-      hold = true;
       break;
     case 'D':
     case 'd':
     case KEY_RIGHT:
       user_action = Right;
-      hold = true;
       break;
     case 'W':
     case 'w':
     case KEY_UP:
       user_action = Up;
-      hold = true;
       break;
     case 'S':
     case 's':
     case KEY_DOWN:
       user_action = Down;
-      hold = true;
       break;
     case ' ':
       user_action = Action;
-      hold = true;
       break;
   }
   return user_action;

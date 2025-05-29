@@ -29,10 +29,11 @@ double getTimeDifference(struct timeval start_time,
  */
 GameInfo_t *getGameInfo_t(bool switch_flag) {
   static GameInfo_t game_info = {0};
-  static int initialized = 0; // 0 - выключено, 1 - включено, 2 -выключение
+  static int initialized = 0;  // 0 - выключено, 1 - включено, 2 -выключение
   static struct timeval start_time = {0};
   if (!initialized) {
-    if (initialGameField(&game_info, &switch_flag, &start_time)) initialized = 1;
+    if (initialGameField(&game_info, &switch_flag, &start_time))
+      initialized = 1;
   }
   if (initialized == 1 && !switch_flag) {
     static field_fsm state_game = Start_Game;
@@ -43,8 +44,7 @@ GameInfo_t *getGameInfo_t(bool switch_flag) {
       game_info.pause = 0;
     }
     double elapsed_time = getTimeDifference(start_time, current_time);
-    if (((elapsed_time >= (120 - game_info.speed) &&
-          state_game == Shift) ||
+    if (((elapsed_time >= (120 - game_info.speed) && state_game == Shift) ||
          (state_game != Shift)) &&
         (game_info.pause == 0) && (game_info.speed > 0)) {
       start_time = current_time;
