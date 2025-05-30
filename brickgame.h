@@ -1,6 +1,8 @@
 #ifndef BRICKGAME_H
 #define BRICKGAME_H
 
+#include <iostream>
+
 #include "brick_game/snake/snake.h"
 #ifdef __cplusplus
 extern "C" {

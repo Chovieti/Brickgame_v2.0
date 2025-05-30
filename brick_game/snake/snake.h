@@ -22,8 +22,17 @@ class Snake_Model {
   Snake_Model();
   ~Snake_Model();
 
-  void userInput(UserAction_t action, bool hold);
   GameInfo_t updateCurrentState();
+  // Методы доступа к полям модели для контроллера
+  void setDirection(SnakeDirection direction);
+  SnakeDirection getDirection();
+  void setSpeedBoost();
+  void setGameSpeed();
+  int getGameSpeed();
+  void setGamePause(int set);
+  int getGamePause();
+  // Очистка матриц
+  void clearMatrix();
 
  private:
   struct SegmentCoor {
@@ -42,20 +51,19 @@ class Snake_Model {
   GameInfo_t game_info;
   SnakeInfo_t snake_info;
 
-
+  // Добавление и удаление змейки на поле
   void addSnakeOnField();
   void removeSnakeOnField();
-
+  // Методы FSM
   field_fsm FSMField();
   field_fsm FSMStartGame();
   field_fsm FSMSpawn(std::mt19937& generator);
   field_fsm FSMMovement();
   field_fsm FSMWin();
   field_fsm FSMGameOver();
+  // Сохранение и чтение рекорда
   void readScore();
   void saveScore();
-
-  void clearMatrix();
 };
 
 class Snake_Controller {
@@ -63,9 +71,7 @@ class Snake_Controller {
   Snake_Controller() = default;
   ~Snake_Controller() = default;
 
-  void userInput(UserAction_t action, bool hold) {
-    snake_model_for_controller.userInput(action, hold);
-  }
+  void userInput(UserAction_t action, bool hold);
 
   GameInfo_t updateCurrentState() {
     return snake_model_for_controller.updateCurrentState();

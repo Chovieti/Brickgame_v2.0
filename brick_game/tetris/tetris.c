@@ -513,6 +513,7 @@ field_fsm fsmField(GameInfo_t *game_info) {
  * @return Возвращает следующее состояние игры Spawn.
  */
 field_fsm fsmStartGame(GameInfo_t *game_info) {
+  if (game_info->score >= game_info->high_score) saveScore(game_info->score);
   game_info->high_score = readScore();
 #ifdef __linux__
   int random_number = (rand() % 7);

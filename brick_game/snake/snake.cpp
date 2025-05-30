@@ -16,43 +16,6 @@ Snake_Model::~Snake_Model() {
   clearMatrix();
 }
 
-
-void Snake_Model::userInput(UserAction_t action, bool hold) {
-  if (action == Up && hold == true &&
-      (snake_info.real_direction == RIGHT ||
-       snake_info.real_direction == LEFT)) {
-    snake_info.next_direction = UP;
-  }
-  if (action == Right && hold == true &&
-      (snake_info.real_direction == UP || snake_info.real_direction == DOWN)) {
-    snake_info.next_direction = RIGHT;
-  }
-  if (action == Down && hold == true &&
-      (snake_info.real_direction == RIGHT ||
-       snake_info.real_direction == LEFT)) {
-    snake_info.next_direction = DOWN;
-  }
-  if (action == Left && hold == true &&
-      (snake_info.real_direction == UP || snake_info.real_direction == DOWN)) {
-    snake_info.next_direction = LEFT;
-  }
-  if (action == Action && hold == true && game_info.pause == 0) {
-    snake_info.speed_boost_ = true;
-  }
-  if (action == Pause && hold == true) {
-    if (game_info.pause == 0 && game_info.speed > 0)
-      game_info.pause = 1;
-    else
-      game_info.pause = 0;
-  }
-  if (action == Start && hold == true) {
-    game_info.speed = 1;
-  }
-  if (action == Terminate && hold == true) {
-    clearMatrix();
-  }
-}
-
 GameInfo_t Snake_Model::updateCurrentState() {
   // Просто игровой цикл без разделения
   using namespace std::chrono;
@@ -73,15 +36,45 @@ GameInfo_t Snake_Model::updateCurrentState() {
     }
 
     if ((((elapsed_time.count() >= threshold && state_game == Movement) ||
-         state_game != Movement) || snake_info.speed_boost_) &&
+          state_game != Movement) ||
+         snake_info.speed_boost_) &&
         game_info.pause == 0 && game_info.speed > 0) {
-        snake_info.speed_boost_ = false;
+      snake_info.speed_boost_ = false;
       start_time = current_time;
       state_game = Snake_Model::FSMField();
     }
   }
 
   return game_info;
+}
+
+void Snake_Model::setDirection(SnakeDirection direction) {
+  snake_info.next_direction = direction;
+}
+SnakeDirection Snake_Model::getDirection() { return snake_info.real_direction; }
+void Snake_Model::setSpeedBoost() { snake_info.speed_boost_ = true; }
+void Snake_Model::setGameSpeed() { game_info.speed = 1; }
+int Snake_Model::getGameSpeed() { return game_info.speed; }
+void Snake_Model::setGamePause(int set) { game_info.pause = set; }
+int Snake_Model::getGamePause() { return game_info.pause; }
+
+void Snake_Model::clearMatrix() {
+  if (game_info.field) {
+    for (int i = 0; i < HEIGHT; i++) {
+      delete[] game_info.field[i];
+      game_info.field[i] = nullptr;
+    }
+    delete[] game_info.field;
+    game_info.field = nullptr;
+  }
+  if (game_info.next) {
+    for (int i = 0; i < NEXT_SIZE; i++) {
+      delete[] game_info.next[i];
+      game_info.next[i] = nullptr;
+    }
+    delete[] game_info.next;
+    game_info.next = nullptr;
+  }
 }
 
 void Snake_Model::addSnakeOnField() {
@@ -124,6 +117,7 @@ field_fsm Snake_Model::FSMField() {
 }
 
 field_fsm Snake_Model::FSMStartGame() {
+  if (game_info.score >= game_info.high_score) saveScore();
   // Чтение файла рекорда
   readScore();
   // Зануление матрицы поля
@@ -246,22 +240,40 @@ void Snake_Model::saveScore() {
   file_score << game_info.score;
 }
 
-void Snake_Model::clearMatrix() {
-    if (game_info.field) {
-    for (int i = 0; i < HEIGHT; i++) {
-      delete[] game_info.field[i];
-      game_info.field[i] = nullptr;
-    }
-    delete[] game_info.field;
-    game_info.field = nullptr;
+void Snake_Controller::userInput(UserAction_t action, bool hold) {
+  SnakeDirection realDirection = snake_model_for_controller.getDirection();
+  if (action == Up && hold == true &&
+      (realDirection == RIGHT || realDirection == LEFT)) {
+    snake_model_for_controller.setDirection(UP);
   }
-  if (game_info.next) {
-    for (int i = 0; i < NEXT_SIZE; i++) {
-      delete[] game_info.next[i];
-      game_info.next[i] = nullptr;
-    }
-    delete[] game_info.next;
-    game_info.next = nullptr;
+  if (action == Right && hold == true &&
+      (realDirection == UP || realDirection == DOWN)) {
+    snake_model_for_controller.setDirection(RIGHT);
+  }
+  if (action == Down && hold == true &&
+      (realDirection == RIGHT || realDirection == LEFT)) {
+    snake_model_for_controller.setDirection(DOWN);
+  }
+  if (action == Left && hold == true &&
+      (realDirection == UP || realDirection == DOWN)) {
+    snake_model_for_controller.setDirection(LEFT);
+  }
+  if (action == Action && hold == true &&
+      snake_model_for_controller.getGamePause() == 0) {
+    snake_model_for_controller.setSpeedBoost();
+  }
+  if (action == Pause && hold == true) {
+    if (snake_model_for_controller.getGamePause() == 0 &&
+        snake_model_for_controller.getGameSpeed() > 0)
+      snake_model_for_controller.setGamePause(1);
+    else
+      snake_model_for_controller.setGamePause(0);
+  }
+  if (action == Start && hold == true) {
+    snake_model_for_controller.setGameSpeed();
+  }
+  if (action == Terminate && hold == true) {
+    snake_model_for_controller.clearMatrix();
   }
 }
 
