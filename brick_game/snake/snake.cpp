@@ -2,7 +2,7 @@
 
 namespace s21 {
 // Snake_Model
-Snake_Model::Snake_Model() {
+Snake_Model::Snake_Model() : game_state(Start_Game) {
   game_info.field = new int *[HEIGHT];
   game_info.next = new int *[NEXT_SIZE];
   for (int i = 0; i < HEIGHT; i++) {
@@ -12,7 +12,7 @@ Snake_Model::Snake_Model() {
 }
 
 Snake_Model::~Snake_Model() {
-  if (game_info.score >= game_info.high_score) saveScore();
+  if (game_info.score > game_info.high_score) saveScore();
   clearMatrix();
 }
 
@@ -29,19 +29,13 @@ GameInfo_t Snake_Model::updateCurrentState() {
     auto elapsed_time = duration_cast<milliseconds>(current_time - start_time);
     const int threshold = (BASE_DELAY_100TH - game_info.speed) * 10;
 
-    static field_fsm state_game = Start_Game;
-    if (game_info.speed == 1) {
-      state_game = Start_Game;
-      game_info.pause = 0;
-    }
-
-    if ((((elapsed_time.count() >= threshold && state_game == Movement) ||
-          state_game != Movement) ||
+    if ((((elapsed_time.count() >= threshold && game_state == Movement) ||
+          game_state != Movement) ||
          snake_info.speed_boost_) &&
         game_info.pause == 0 && game_info.speed > 0) {
       snake_info.speed_boost_ = false;
       start_time = current_time;
-      state_game = Snake_Model::FSMField();
+      Snake_Model::FSMField();
     }
   }
 
@@ -57,6 +51,7 @@ void Snake_Model::setGameSpeed() { game_info.speed = 1; }
 int Snake_Model::getGameSpeed() { return game_info.speed; }
 void Snake_Model::setGamePause(int set) { game_info.pause = set; }
 int Snake_Model::getGamePause() { return game_info.pause; }
+field_fsm Snake_Model::getGameState() { return game_state; }
 
 void Snake_Model::clearMatrix() {
   if (game_info.field) {
@@ -89,8 +84,7 @@ void Snake_Model::removeSnakeOnField() {
   }
 }
 
-field_fsm Snake_Model::FSMField() {
-  static field_fsm game_state = Start_Game;
+void Snake_Model::FSMField() {
   static std::mt19937 gen(std::random_device{}());
   if (game_info.speed == 1) {
     game_state = Start_Game;
@@ -113,11 +107,10 @@ field_fsm Snake_Model::FSMField() {
       game_state = FSMGameOver();
       break;
   }
-  return game_state;
 }
 
 field_fsm Snake_Model::FSMStartGame() {
-  if (game_info.score >= game_info.high_score) saveScore();
+  if (game_info.score > game_info.high_score) saveScore();
   // Чтение файла рекорда
   readScore();
   // Зануление матрицы поля
@@ -240,6 +233,7 @@ void Snake_Model::saveScore() {
   file_score << game_info.score;
 }
 
+// Snake_Controller
 void Snake_Controller::userInput(UserAction_t action, bool hold) {
   SnakeDirection realDirection = snake_model_for_controller.getDirection();
   if (action == Up && hold == true &&
@@ -269,26 +263,23 @@ void Snake_Controller::userInput(UserAction_t action, bool hold) {
     else
       snake_model_for_controller.setGamePause(0);
   }
-  if (action == Start && hold == true) {
+  if (action == Start && hold == true && (snake_model_for_controller.getGamePause() || snake_model_for_controller.getGameSpeed() <= 0)) {
     snake_model_for_controller.setGameSpeed();
+    snake_model_for_controller.setGamePause(0);
   }
   if (action == Terminate && hold == true) {
     snake_model_for_controller.clearMatrix();
   }
 }
 
-// Snake_Controller
-Snake_Controller *snake_controll() {
-  static Snake_Controller snake_control;
-  return &snake_control;
+
+// SnakeAdapter
+void SnakeAdapter::userInput(UserAction_t action, bool hold) {
+  controller.userInput(action, hold);
 }
-void userInput(UserAction_t action, bool hold) {
-  Snake_Controller *snake_control = snake_controll();
-  snake_control->userInput(action, hold);
-}
-GameInfo_t updateCurrentState() {
-  Snake_Controller *snake_control = snake_controll();
-  return snake_control->updateCurrentState();
+
+GameInfo_t SnakeAdapter::updateCurrentState() {
+  return controller.updateCurrentState();
 }
 
 }  // namespace s21

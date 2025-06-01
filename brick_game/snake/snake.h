@@ -31,6 +31,7 @@ class Snake_Model {
   int getGameSpeed();
   void setGamePause(int set);
   int getGamePause();
+  field_fsm getGameState();
   // Очистка матриц
   void clearMatrix();
 
@@ -50,12 +51,13 @@ class Snake_Model {
 
   GameInfo_t game_info;
   SnakeInfo_t snake_info;
+  field_fsm game_state;
 
   // Добавление и удаление змейки на поле
   void addSnakeOnField();
   void removeSnakeOnField();
   // Методы FSM
-  field_fsm FSMField();
+  void FSMField();
   field_fsm FSMStartGame();
   field_fsm FSMSpawn(std::mt19937& generator);
   field_fsm FSMMovement();
@@ -81,9 +83,14 @@ class Snake_Controller {
   Snake_Model snake_model_for_controller;
 };
 
-Snake_Controller* snake_controll();
-void userInput(UserAction_t action, bool hold);
-GameInfo_t updateCurrentState();
+namespace SnakeAdapter {
+    // Экземпляр контроллера (не синглтон!)
+    static Snake_Controller controller;
+
+    void userInput(UserAction_t action, bool hold);
+
+    GameInfo_t updateCurrentState();
+}
 
 }  // namespace s21
 
