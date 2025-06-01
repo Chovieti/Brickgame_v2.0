@@ -1,31 +1,22 @@
-#include <QApplication>
-#include <QKeyEvent>
-#include <QPainter>
-#include <QTimer>
-#include <QWidget>
-
-#include "../../brickgame.h"
+// #include "../../brickgame.h"
+#include "desktop_screen.h"
 
 // Кастомный виджет для отображения матрицы
-class GameWidget : public QWidget {
-  Q_OBJECT
- public:
-  // Конструктор виджета
-  GameWidget(void (*userInput)(UserAction_t, bool),
-             GameInfo_t (*updateCurrentState)(), QWidget *parent = nullptr)
-      : QWidget(parent),
-        userInput(userInput),
-        updateCurrentState(updateCurrentState) {
-    setFocusPolicy(Qt::StrongFocus);
-    connect(&gameTimer, &QTimer::timeout, this, &GameWidget::gameLoop);
-    gameTimer.start(50);
-    game_info.field = nullptr;
-    game_info.next = nullptr;
-  }
+// Конструктор виджета
+GameWidget::GameWidget(void (*userInput)(UserAction_t, bool),
+           GameInfo_t (*updateCurrentState)(), QWidget *parent)
+    : QWidget(parent),
+      userInput(userInput),
+      updateCurrentState(updateCurrentState) {
+  setFocusPolicy(Qt::StrongFocus);
+  connect(&gameTimer, &QTimer::timeout, this, &GameWidget::gameLoop);
+  gameTimer.start(50);
+  game_info.field = nullptr;
+  game_info.next = nullptr;
+}
 
- protected:
-  // Переопределяем метод рисования виджета
-  void paintEvent(QPaintEvent *) override {
+// Переопределяем метод рисования виджета
+void GameWidget::paintEvent(QPaintEvent *) {
     if (!game_info.field || !game_info.next) return;
     static double speed = 0.0;
     if (game_info.speed > 0 && game_info.speed <= 100)
@@ -85,7 +76,7 @@ class GameWidget : public QWidget {
     }
   }
 
-  void keyPressEvent(QKeyEvent *event) override {
+void GameWidget::keyPressEvent(QKeyEvent *event) {
     UserAction_t action;
     bool hold = false;
     switch (event->key()) {
@@ -133,8 +124,7 @@ class GameWidget : public QWidget {
     if (action == Terminate) QApplication::quit();
   }
 
- private slots:
-  void gameLoop() {
+void GameWidget::gameLoop() {
     game_info = updateCurrentState();
     if (!game_info.field || !game_info.next) {
       gameTimer.stop();
@@ -144,25 +134,18 @@ class GameWidget : public QWidget {
     update();
   }
 
- private:
-  GameInfo_t game_info;
-  QTimer gameTimer;
-  void (*userInput)(UserAction_t, bool);
-  GameInfo_t (*updateCurrentState)();
-};
+// #include "desktop_screen.moc"
 
-#include "desktop_screen.moc"
+// int brickGameDescktop(void (*userInput)(UserAction_t, bool),
+//                       GameInfo_t (*updateCurrentState)()) {
+//   char **argv = nullptr;
+//   int argc = 0;
+//   QApplication app(argc, argv);
 
-int brickGameDescktop(void (*userInput)(UserAction_t, bool),
-                      GameInfo_t (*updateCurrentState)()) {
-  char **argv = nullptr;
-  int argc = 0;
-  QApplication app(argc, argv);
-
-  // Главное окно
-  GameWidget window(userInput, updateCurrentState);
-  window.setWindowTitle("BrickGameV2.0");
-  window.setFixedSize(380, 420);
-  window.show();
-  return app.exec();
-}
+//   // Главное окно
+//   GameWidget window(userInput, updateCurrentState);
+//   window.setWindowTitle("BrickGameV2.0");
+//   window.setFixedSize(380, 420);
+//   window.show();
+//   return app.exec();
+// }

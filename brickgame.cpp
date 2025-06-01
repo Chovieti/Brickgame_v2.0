@@ -12,9 +12,9 @@ int main() {
   } else if (interface == 2 && game == 1) {
     brickGameDescktop(userInput, updateCurrentState);
   } else if (interface == 1 && game == 2) {
-    brickGameConsole(s21::userInput, s21::updateCurrentState);
+    brickGameConsole(s21::SnakeAdapter::userInput, s21::SnakeAdapter::updateCurrentState);
   } else if (interface == 2 && game == 2) {
-    brickGameDescktop(s21::userInput, s21::updateCurrentState);
+    brickGameDescktop(s21::SnakeAdapter::userInput, s21::SnakeAdapter::updateCurrentState);
   } else
     std::cout << "Такого нету" << std::endl;
   return 0;
@@ -39,4 +39,18 @@ void brickGameConsole(void (*userInput)(UserAction_t, bool),
   }
   curs_set(1);
   endwin();
+}
+
+int brickGameDescktop(void (*userInput)(UserAction_t, bool),
+                      GameInfo_t (*updateCurrentState)()) {
+  char **argv = nullptr;
+  int argc = 0;
+  QApplication app(argc, argv);
+
+  // Главное окно
+  GameWidget window(userInput, updateCurrentState);
+  window.setWindowTitle("BrickGameV2.0");
+  window.setFixedSize(380, 420);
+  window.show();
+  return app.exec();
 }

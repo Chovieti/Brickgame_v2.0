@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "brick_game/snake/snake.h"
+#include "gui/desktop/desktop_screen.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
