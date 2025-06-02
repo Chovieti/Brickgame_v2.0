@@ -1,6 +1,8 @@
 #ifndef LIB_STRUCT_H
 #define LIB_STRUCT_H
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @enum UserAction_t
  * @brief Перечисление возможных действий пользователя.
@@ -35,5 +37,7 @@ typedef struct {
   int speed;      /**< Скорость падения фигур.*/
   int pause;      /**< Пауза (1 - пауза, 0 - игра идет).*/
 } GameInfo_t;
-
+#ifdef __cplusplus
+}
+#endif
 #endif

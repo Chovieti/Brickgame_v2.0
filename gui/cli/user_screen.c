@@ -1,10 +1,5 @@
 #include "../../headers/user_screen.h"
 
-// int main() {
-//   brickGame();
-//   return 0;
-// }
-
 /**
  * @brief Инициализирует библиотеку ncurses для работы с интерфейсом.
  *
@@ -33,7 +28,6 @@ void setupNcurses() {
 /**
  * @brief Считывает нажатие от пользователя и передает его в функцию userInput.
  */
-// void readInput() {
 UserAction_t readInput() {
   UserAction_t user_action = -1;
   int input = getch();
@@ -75,7 +69,6 @@ UserAction_t readInput() {
       break;
   }
   return user_action;
-  // userInput(user_action, hold);
 }
 
 /**

@@ -12,9 +12,11 @@ int main() {
   } else if (interface == 2 && game == 1) {
     brickGameDescktop(userInput, updateCurrentState);
   } else if (interface == 1 && game == 2) {
-    brickGameConsole(s21::SnakeAdapter::userInput, s21::SnakeAdapter::updateCurrentState);
+    brickGameConsole(s21::SnakeAdapter::userInput,
+                     s21::SnakeAdapter::updateCurrentState);
   } else if (interface == 2 && game == 2) {
-    brickGameDescktop(s21::SnakeAdapter::userInput, s21::SnakeAdapter::updateCurrentState);
+    brickGameDescktop(s21::SnakeAdapter::userInput,
+                      s21::SnakeAdapter::updateCurrentState);
   } else
     std::cout << "Такого нету" << std::endl;
   return 0;
@@ -31,7 +33,7 @@ void brickGameConsole(void (*userInput)(UserAction_t, bool),
   while (true) {
     userInput(readInput(), true);
     game_info = updateCurrentState();
-    if (game_info.field == NULL || game_info.next == NULL) break;
+    if (!game_info.field || !game_info.next) break;
     clear();
     drawField(game_info);
     refresh();

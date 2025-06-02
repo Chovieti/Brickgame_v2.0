@@ -16,29 +16,13 @@ Snake_Model::~Snake_Model() {
   clearMatrix();
 }
 
-GameInfo_t Snake_Model::updateCurrentState() {
-  // Просто игровой цикл без разделения
-  using namespace std::chrono;
-  using namespace std::chrono_literals;
-  if (game_info.speed <= 100) {
-    static auto start_time = steady_clock::now();
-    constexpr int BASE_DELAY_100TH = 120;
+GameInfo_t Snake_Model::getGameInfo() { return game_info; }
 
-    auto current_time = steady_clock::now();
-
-    auto elapsed_time = duration_cast<milliseconds>(current_time - start_time);
-    const int threshold = (BASE_DELAY_100TH - game_info.speed) * 10;
-
-    if ((((elapsed_time.count() >= threshold && game_state == Movement) ||
-          game_state != Movement) ||
-         snake_info.speed_boost_) &&
-        game_info.pause == 0 && game_info.speed > 0) {
-      snake_info.speed_boost_ = false;
-      start_time = current_time;
-      Snake_Model::FSMField();
-    }
+GameInfo_t Snake_Model::updateInfo() {
+  if (game_info.field && game_info.next) {
+    snake_info.speed_boost_ = false;
+    Snake_Model::FSMField();
   }
-
   return game_info;
 }
 
@@ -47,6 +31,7 @@ void Snake_Model::setDirection(SnakeDirection direction) {
 }
 SnakeDirection Snake_Model::getDirection() { return snake_info.real_direction; }
 void Snake_Model::setSpeedBoost() { snake_info.speed_boost_ = true; }
+bool Snake_Model::getSpeedBoost() { return snake_info.speed_boost_; }
 void Snake_Model::setGameSpeed() { game_info.speed = 1; }
 int Snake_Model::getGameSpeed() { return game_info.speed; }
 void Snake_Model::setGamePause(int set) { game_info.pause = set; }
@@ -263,7 +248,9 @@ void Snake_Controller::userInput(UserAction_t action, bool hold) {
     else
       snake_model_for_controller.setGamePause(0);
   }
-  if (action == Start && hold == true && (snake_model_for_controller.getGamePause() || snake_model_for_controller.getGameSpeed() <= 0)) {
+  if (action == Start && hold == true &&
+      (snake_model_for_controller.getGamePause() ||
+       snake_model_for_controller.getGameSpeed() <= 0)) {
     snake_model_for_controller.setGameSpeed();
     snake_model_for_controller.setGamePause(0);
   }
@@ -272,6 +259,31 @@ void Snake_Controller::userInput(UserAction_t action, bool hold) {
   }
 }
 
+GameInfo_t Snake_Controller::updateCurrentState() {
+  using namespace std::chrono;
+  using namespace std::chrono_literals;
+  GameInfo_t game_info = snake_model_for_controller.getGameInfo();
+  int speed = snake_model_for_controller.getGameSpeed();
+  if (game_info.speed <= 100) {
+    static auto start_time = steady_clock::now();
+    constexpr int BASE_DELAY_100TH = 120;
+
+    auto current_time = steady_clock::now();
+
+    auto elapsed_time = duration_cast<milliseconds>(current_time - start_time);
+    const int threshold = (BASE_DELAY_100TH - speed) * 10;
+
+    if ((((elapsed_time.count() >= threshold &&
+           snake_model_for_controller.getGameState() == Movement) ||
+          snake_model_for_controller.getGameState() != Movement) ||
+         snake_model_for_controller.getSpeedBoost()) &&
+        snake_model_for_controller.getGamePause() == 0 && speed > 0) {
+      start_time = current_time;
+      game_info = snake_model_for_controller.updateInfo();
+    }
+  }
+  return game_info;
+}
 
 // SnakeAdapter
 void SnakeAdapter::userInput(UserAction_t action, bool hold) {

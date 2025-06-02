@@ -24,9 +24,12 @@ class Snake_Model {
 
   GameInfo_t updateCurrentState();
   // Методы доступа к полям модели для контроллера
+  GameInfo_t getGameInfo();
+  GameInfo_t updateInfo();
   void setDirection(SnakeDirection direction);
   SnakeDirection getDirection();
   void setSpeedBoost();
+  bool getSpeedBoost();
   void setGameSpeed();
   int getGameSpeed();
   void setGamePause(int set);
@@ -75,22 +78,19 @@ class Snake_Controller {
 
   void userInput(UserAction_t action, bool hold);
 
-  GameInfo_t updateCurrentState() {
-    return snake_model_for_controller.updateCurrentState();
-  }
+  GameInfo_t updateCurrentState();
 
  private:
   Snake_Model snake_model_for_controller;
 };
 
 namespace SnakeAdapter {
-    // Экземпляр контроллера (не синглтон!)
-    static Snake_Controller controller;
+static Snake_Controller controller;
 
-    void userInput(UserAction_t action, bool hold);
+void userInput(UserAction_t action, bool hold);
 
-    GameInfo_t updateCurrentState();
-}
+GameInfo_t updateCurrentState();
+}  // namespace SnakeAdapter
 
 }  // namespace s21
 
