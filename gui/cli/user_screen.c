@@ -86,8 +86,8 @@ void drawField(GameInfo_t game_info) {
   drawGameField(game_info);
   drawNextFigure(game_info);
   drawStatField(game_info);
-  if (game_info.speed < 0) {  // Экран позора
-    drawLoseScreen(game_info);
+  if (game_info.speed < 0 || game_info.speed == 200) {  // Экран проигрыша/победы
+    drawGameOverScreen(game_info);
   } else if (game_info.speed == 0) {  // Надпись начала игры
     drawStartText();
   }
@@ -170,7 +170,7 @@ void drawStatField(GameInfo_t game_info) {
     snprintf(buffer, sizeof(buffer), "Speed: 0");
   else if (game_info.speed == -1)
     snprintf(buffer, sizeof(buffer), "Speed: %.4lf", speed);
-  else {
+  else if (game_info.speed <= 100) {
     speed = 100 / (120.0 - game_info.speed);
     snprintf(buffer, sizeof(buffer), "Speed: %.4lf", speed);
   }
@@ -198,10 +198,10 @@ void drawStatField(GameInfo_t game_info) {
 }
 
 /**
- * @brief Отрисовывает экран поражения.
+ * @brief Отрисовывает экран завершения игры.
  * @param game_info Структура содержащая информацию об игре.
  */
-void drawLoseScreen(GameInfo_t game_info) {
+void drawGameOverScreen(GameInfo_t game_info) {
   int indent = 0;
   char buffer[30] = {0};
   for (int x = 0; x < 8; x++) {
@@ -220,14 +220,20 @@ void drawLoseScreen(GameInfo_t game_info) {
     }
   }
   indent += 2;
-  snprintf(buffer, sizeof(buffer), "You Lose");
-  mvaddstr(Y_START_LOSE_SCREEN + indent, X_TEXT_SCREEN + 1, buffer);
-  indent += 2;
-  snprintf(buffer, sizeof(buffer), "Your Score");
-  mvaddstr(Y_START_LOSE_SCREEN + indent, X_TEXT_SCREEN, buffer);
-  indent += 2;
-  snprintf(buffer, sizeof(buffer), "%8d", game_info.score);
-  mvaddstr(Y_START_LOSE_SCREEN + indent, X_TEXT_SCREEN + 1, buffer);
+  if (game_info.speed < 0) {
+    snprintf(buffer, sizeof(buffer), "You Lose");
+    mvaddstr(Y_START_LOSE_SCREEN + indent, X_TEXT_SCREEN + 1, buffer);
+    indent += 2;
+    snprintf(buffer, sizeof(buffer), "Your Score");
+    mvaddstr(Y_START_LOSE_SCREEN + indent, X_TEXT_SCREEN, buffer);
+    indent += 2;
+    snprintf(buffer, sizeof(buffer), "%8d", game_info.score);
+    mvaddstr(Y_START_LOSE_SCREEN + indent, X_TEXT_SCREEN + 1, buffer);
+  } else if(game_info.speed == 200) {
+    indent += 2;
+    snprintf(buffer, sizeof(buffer), "You Win!");
+    mvaddstr(Y_START_LOSE_SCREEN + indent, X_TEXT_SCREEN + 1, buffer);
+  }
 }
 
 /**

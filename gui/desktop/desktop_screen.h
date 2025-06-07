@@ -29,6 +29,14 @@ class GameWidget : public QWidget {
   QTimer gameTimer;
   void (*userInput)(UserAction_t, bool);
   GameInfo_t (*updateCurrentState)();
+
+  void drawBackground(QPainter& painter);
+  void drawGameBorders(QPainter& painter);
+  void drawNextPieceSection(QPainter& painter);
+  void drawStatsSection(QPainter& painter, double game_speed_metric);
+  void drawGameField(QPainter& painter);
+  void drawSpecialScreens(QPainter& painter);
+  
 };
 
 #endif

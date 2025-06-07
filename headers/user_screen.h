@@ -70,7 +70,7 @@ void drawFieldBorder();
 void drawGameField(GameInfo_t game_info);
 void drawNextFigure(GameInfo_t game_info);
 void drawStatField(GameInfo_t game_info);
-void drawLoseScreen(GameInfo_t game_info);
+void drawGameOverScreen(GameInfo_t game_info);
 void drawStartText();
 
 #ifdef __cplusplus

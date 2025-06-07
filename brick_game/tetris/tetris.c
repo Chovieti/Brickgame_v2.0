@@ -645,8 +645,6 @@ field_fsm fsmShift(GameInfo_t *game_info, FigureInfo *figure_info) {
          j < figure_info->coor_x + NEXT_ROWS_AND_COLUMNS && j < 10; j++) {
       if (game_info->field[i][j] == 1) {
         if (collision) {
-          // figure_info->moving = false;
-          // game_info->field[i][j] = 2;
           game_state = Attaching;
         } else {
           game_info->field[i][j] = 0;
@@ -655,7 +653,6 @@ field_fsm fsmShift(GameInfo_t *game_info, FigureInfo *figure_info) {
       }
     }
   }
-  // if (figure_info->moving == false) game_state = Attaching;
   return game_state;
 }
 

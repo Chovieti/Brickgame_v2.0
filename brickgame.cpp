@@ -29,7 +29,7 @@ int main() {
 void brickGameConsole(void (*userInput)(UserAction_t, bool),
                       GameInfo_t (*updateCurrentState)()) {
   setupNcurses();
-  static GameInfo_t game_info = {0};
+  GameInfo_t game_info = {0};
   while (true) {
     userInput(readInput(), true);
     game_info = updateCurrentState();

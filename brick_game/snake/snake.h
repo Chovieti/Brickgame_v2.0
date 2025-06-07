@@ -8,6 +8,7 @@
 #include <deque>
 #include <fstream>
 #include <random>
+#include <sstream>
 
 #include "../../lib_struct.h"
 
@@ -24,17 +25,22 @@ class Snake_Model {
 
   GameInfo_t updateCurrentState();
   // Методы доступа к полям модели для контроллера
-  GameInfo_t getGameInfo();
+  GameInfo_t getGameInfo() const;
   GameInfo_t updateInfo();
+  bool shouldUpdate(std::chrono::milliseconds elapsed_time) const;
+  int calculateUpdateThreshold() const;
+
   void setDirection(SnakeDirection direction);
-  SnakeDirection getDirection();
+  SnakeDirection getDirection() const;
   void setSpeedBoost();
-  bool getSpeedBoost();
+  bool getSpeedBoost() const;
   void setGameSpeed();
-  int getGameSpeed();
+  int getGameSpeed() const;
   void setGamePause(int set);
-  int getGamePause();
-  field_fsm getGameState();
+  int getGamePause() const;
+  field_fsm getGameState() const;
+  bool isMovementState() const;
+  bool isActive() const;
   // Очистка матриц
   void clearMatrix();
 
@@ -50,6 +56,7 @@ class Snake_Model {
     SnakeDirection next_direction;
     bool speed_boost_ = false;
     SegmentCoor getHead() { return body.front(); }
+    SegmentCoor getTail() { return body.back(); }
   };
 
   GameInfo_t game_info;
@@ -59,6 +66,9 @@ class Snake_Model {
   // Добавление и удаление змейки на поле
   void addSnakeOnField();
   void removeSnakeOnField();
+  void spawnNewGameSnake();
+
+  bool checkCollision(SegmentCoor head);
   // Методы FSM
   void FSMField();
   field_fsm FSMStartGame();
