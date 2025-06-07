@@ -86,7 +86,8 @@ void drawField(GameInfo_t game_info) {
   drawGameField(game_info);
   drawNextFigure(game_info);
   drawStatField(game_info);
-  if (game_info.speed < 0 || game_info.speed == 200) {  // Экран проигрыша/победы
+  if (game_info.speed < 0 ||
+      game_info.speed == 200) {  // Экран проигрыша/победы
     drawGameOverScreen(game_info);
   } else if (game_info.speed == 0) {  // Надпись начала игры
     drawStartText();
@@ -229,7 +230,7 @@ void drawGameOverScreen(GameInfo_t game_info) {
     indent += 2;
     snprintf(buffer, sizeof(buffer), "%8d", game_info.score);
     mvaddstr(Y_START_LOSE_SCREEN + indent, X_TEXT_SCREEN + 1, buffer);
-  } else if(game_info.speed == 200) {
+  } else if (game_info.speed == 200) {
     indent += 2;
     snprintf(buffer, sizeof(buffer), "You Win!");
     mvaddstr(Y_START_LOSE_SCREEN + indent, X_TEXT_SCREEN + 1, buffer);

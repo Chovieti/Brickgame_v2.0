@@ -15,11 +15,11 @@ class GameWidget : public QWidget {
  public:
   explicit GameWidget(void (*userInput)(UserAction_t, bool),
                       GameInfo_t (*updateCurrentState)(),
-                      QWidget *parent = nullptr);
+                      QWidget* parent = nullptr);
 
  protected:
-  void paintEvent(QPaintEvent *event) override;
-  void keyPressEvent(QKeyEvent *event) override;
+  void paintEvent(QPaintEvent* event) override;
+  void keyPressEvent(QKeyEvent* event) override;
 
  private slots:
   void gameLoop();
@@ -36,7 +36,6 @@ class GameWidget : public QWidget {
   void drawStatsSection(QPainter& painter, double game_speed_metric);
   void drawGameField(QPainter& painter);
   void drawSpecialScreens(QPainter& painter);
-  
 };
 
 #endif

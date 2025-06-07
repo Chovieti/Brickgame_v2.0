@@ -19,18 +19,21 @@ Snake_Model::~Snake_Model() {
 
 GameInfo_t Snake_Model::getGameInfo() const { return game_info; }
 
-
 bool Snake_Model::shouldUpdate(std::chrono::milliseconds elapsed_time) const {
   if (!isActive()) return false;
   if (snake_info.speed_boost_ || !isMovementState()) return true;
   return elapsed_time.count() >= calculateUpdateThreshold();
 }
 
-bool Snake_Model::isMovementState() const { return game_state == Movement;}
+bool Snake_Model::isMovementState() const { return game_state == Movement; }
 
-bool Snake_Model::isActive() const { return game_info.speed > 0 && game_info.speed <= 100 && !game_info.pause; }
+bool Snake_Model::isActive() const {
+  return game_info.speed > 0 && game_info.speed <= 100 && !game_info.pause;
+}
 
-int Snake_Model::calculateUpdateThreshold() const { return (120 - game_info.speed) * 10;}
+int Snake_Model::calculateUpdateThreshold() const {
+  return (120 - game_info.speed) * 10;
+}
 
 GameInfo_t Snake_Model::updateInfo() {
   if (game_info.field && game_info.next) {
@@ -42,7 +45,9 @@ GameInfo_t Snake_Model::updateInfo() {
 void Snake_Model::setDirection(SnakeDirection direction) {
   snake_info.next_direction = direction;
 }
-SnakeDirection Snake_Model::getDirection() const { return snake_info.real_direction; }
+SnakeDirection Snake_Model::getDirection() const {
+  return snake_info.real_direction;
+}
 void Snake_Model::setSpeedBoost() { snake_info.speed_boost_ = true; }
 bool Snake_Model::getSpeedBoost() const { return snake_info.speed_boost_; }
 void Snake_Model::setGameSpeed() { game_info.speed = 1; }
@@ -193,13 +198,17 @@ bool Snake_Model::checkCollision(SegmentCoor head) {
     return true;
   // С собственным телом
   if ((snake_info.real_direction == UP &&
-       game_info.field[head.y - 1][head.x] == 1 && !(tail.x == head.x && tail.y == head.y - 1)) ||
+       game_info.field[head.y - 1][head.x] == 1 &&
+       !(tail.x == head.x && tail.y == head.y - 1)) ||
       (snake_info.real_direction == RIGHT &&
-       game_info.field[head.y][head.x + 1] == 1 && !(tail.x == head.x + 1 && tail.y == head.y)) ||
+       game_info.field[head.y][head.x + 1] == 1 &&
+       !(tail.x == head.x + 1 && tail.y == head.y)) ||
       (snake_info.real_direction == DOWN &&
-       game_info.field[head.y + 1][head.x] == 1 && !(tail.x == head.x && tail.y == head.y + 1)) ||
+       game_info.field[head.y + 1][head.x] == 1 &&
+       !(tail.x == head.x && tail.y == head.y + 1)) ||
       (snake_info.real_direction == LEFT &&
-       game_info.field[head.y][head.x - 1] == 1 && !(tail.x == head.x - 1 && tail.y == head.y)))
+       game_info.field[head.y][head.x - 1] == 1 &&
+       !(tail.x == head.x - 1 && tail.y == head.y)))
     return true;
   return false;
 }
@@ -280,7 +289,7 @@ void Snake_Controller::userInput(UserAction_t action, bool hold) {
 GameInfo_t Snake_Controller::updateCurrentState() {
   using namespace std::chrono;
   static auto start_time = steady_clock::now();
-  
+
   auto current_time = steady_clock::now();
   auto elapsed_time = duration_cast<milliseconds>(current_time - start_time);
   if (snake_model_for_controller.shouldUpdate(elapsed_time)) {
