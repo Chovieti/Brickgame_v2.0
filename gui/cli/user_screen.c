@@ -1,6 +1,6 @@
 #include "user_screen.h"
 
-void setupNcurses() {
+void SetupNcurses() {
   initscr();
   cbreak();
   noecho();
@@ -9,7 +9,7 @@ void setupNcurses() {
   curs_set(0);
 }
 
-UserAction_t readInput() {
+UserAction_t ReadInput() {
   UserAction_t user_action = -1;
   int input = getch();
   switch (input) {
@@ -52,20 +52,20 @@ UserAction_t readInput() {
   return user_action;
 }
 
-void drawField(GameInfo_t game_info) {
-  drawFieldBorder();
-  drawGameField(game_info);
-  drawNextFigure(game_info);
-  drawStatField(game_info);
+void DrawField(GameInfo_t game_info) {
+  DrawFieldBorder();
+  DrawGameField(game_info);
+  DrawNextFigure(game_info);
+  DrawStatField(game_info);
   if (game_info.speed < 0 ||
       game_info.speed == 200) {  // Экран проигрыша/победы
-    drawGameOverScreen(game_info);
+    DrawGameOverScreen(game_info);
   } else if (game_info.speed == 0) {  // Надпись начала игры
-    drawStartText();
+    DrawStartText();
   }
 }
 
-void drawFieldBorder() {
+void DrawFieldBorder() {
   for (int y = 0; y < 20 + 2; ++y) {
     mvaddch(y + BORDER_OFFSET, BORDER_OFFSET, ACS_CKBOARD);
     mvaddch(y + BORDER_OFFSET, BORDER_OFFSET + (10 * SCALE_X) + 1, ACS_CKBOARD);
@@ -91,7 +91,7 @@ void drawFieldBorder() {
   }
 }
 
-void drawGameField(GameInfo_t game_info) {
+void DrawGameField(GameInfo_t game_info) {
   for (int y = 0; y < 20; ++y) {
     for (int x = 0; x < 10; ++x) {
       if ((game_info.field[y][x] == 1) || (game_info.field[y][x] == 2)) {
@@ -102,7 +102,7 @@ void drawGameField(GameInfo_t game_info) {
   }
 }
 
-void drawNextFigure(GameInfo_t game_info) {
+void DrawNextFigure(GameInfo_t game_info) {
   const char *next_header = "NEXT";
   mvaddstr(3, 33, next_header);
   for (int x = 0; x < 4; ++x) {
@@ -117,7 +117,7 @@ void drawNextFigure(GameInfo_t game_info) {
   }
 }
 
-void drawStatField(GameInfo_t game_info) {
+void DrawStatField(GameInfo_t game_info) {
   int indent = 0;
   char buffer[30] = {0};
   snprintf(buffer, sizeof(buffer), "Level: %d", game_info.level);
@@ -154,7 +154,7 @@ void drawStatField(GameInfo_t game_info) {
   mvaddstr(Y_START_STAT + indent, X_START_STAT, buffer);
 }
 
-void drawGameOverScreen(GameInfo_t game_info) {
+void DrawGameOverScreen(GameInfo_t game_info) {
   int indent = 0;
   char buffer[30] = {0};
   for (int x = 0; x < 8; ++x) {
@@ -189,7 +189,7 @@ void drawGameOverScreen(GameInfo_t game_info) {
   }
 }
 
-void drawStartText() {
+void DrawStartText() {
   char buffer[30] = {0};
   snprintf(buffer, sizeof(buffer), "Press Enter");
   mvaddstr(Y_TEXT_START, X_TEXT_SCREEN, buffer);

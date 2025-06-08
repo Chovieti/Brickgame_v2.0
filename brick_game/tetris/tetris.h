@@ -55,7 +55,7 @@ typedef enum {
   kAttaching, /**< Проверка когда блок упал полностью, будет ли проходить */
               /**< уничтожение линий или нет. */
   kGameOver   /**< Конец игры. */
-} FieldFsm;
+} FieldState;
 
 /**
  * @enum Tetromino
@@ -99,7 +99,7 @@ GameInfo_t updateCurrentState();
  * @note Функция использует статические переменные для хранения состояния игры,
  *       поэтому последующие вызовы будут запоминать предыдущие состояния.
  */
-GameInfo_t *getGameInfo_t(bool switch_flag);
+GameInfo_t *GetGameInfo_t(bool switch_flag);
 
 /**
  * @brief Инициализирует игровое поле и поле для следующей фигуры.
@@ -121,7 +121,7 @@ GameInfo_t *getGameInfo_t(bool switch_flag);
  * памяти необходимо использовать соответствующую функцию (например, блок
  * освобождения памяти в вызывающей функции).
  */
-bool initialGameField(GameInfo_t *game_info, bool *switch_flag,
+bool InitialGameField(GameInfo_t *game_info, bool *switch_flag,
                       struct timeval *start_time);
 
 /**
@@ -129,26 +129,26 @@ bool initialGameField(GameInfo_t *game_info, bool *switch_flag,
  * @param field Поле для которого не выделилась полностью память.
  * @param int Индекс на котором память не смогла выделиться.
  */
-void failFree(int **field, int i);
+void FailFree(int **field, int i);
 
 /**
  * @brief Считывание сохраненного результата из текстового файла.
  * @return Возвращает сохраненный результат.
  */
-int readScore();
+int ReadScore();
 
 /**
  * @brief Сохранение результата в текстовый файл.
  * @param new_score Новый рекорд который будет сохранен.
  */
-void saveScore(int new_score);
+void SaveScore(int new_score);
 
 /**
  * @param start_time Время с которого идет отсчет.
  * @param current_time Прошедшее время.
  * @return Возвращает разницу между прошедшим временем и временем отсчета.
  */
-double getTimeDifference(struct timeval start_time,
+double GetTimeDifference(struct timeval start_time,
                          struct timeval current_time);
 
 /**
@@ -157,7 +157,7 @@ double getTimeDifference(struct timeval start_time,
  * @param game_info Информация об игре содержащую поле на котором ищется фигура
  * и смотрится дальше по направлению есть ли дальше другая фигура или край поля.
  */
-bool checkCollisionForMoving(UserAction_t action, GameInfo_t game_info);
+bool CheckCollisionForMoving(UserAction_t action, GameInfo_t game_info);
 
 /**
  * @brief Проверяет врежется ли фигура при перемещение влево.
@@ -165,7 +165,7 @@ bool checkCollisionForMoving(UserAction_t action, GameInfo_t game_info);
  * и смотрится дальше по направлению есть ли дальше другая фигура или край поля.
  * @param collision Флаг который указывает врежется(true) или нет(false)
  */
-void checkCollisionForMovingLeft(GameInfo_t game_info, bool *collision);
+void CheckCollisionForMovingLeft(GameInfo_t game_info, bool *collision);
 
 /**
  * @brief Проверяет врежется ли фигура при перемещение вправо.
@@ -173,7 +173,7 @@ void checkCollisionForMovingLeft(GameInfo_t game_info, bool *collision);
  * и смотрится дальше по направлению есть ли дальше другая фигура или край поля.
  * @param collision Флаг который указывает врежется(true) или нет(false)
  */
-void checkCollisionForMovingRight(GameInfo_t game_info, bool *collision);
+void CheckCollisionForMovingRight(GameInfo_t game_info, bool *collision);
 
 /**
  * @brief Проверяет врежется ли фигура при перемещение вниз.
@@ -181,7 +181,7 @@ void checkCollisionForMovingRight(GameInfo_t game_info, bool *collision);
  * и смотрится дальше по направлению есть ли дальше другая фигура или край поля.
  * @param collision Флаг который указывает врежется(true) или нет(false)
  */
-void checkCollisionForMovingDown(GameInfo_t game_info, bool *collision);
+void CheckCollisionForMovingDown(GameInfo_t game_info, bool *collision);
 
 /**
  * @brief Получает информацию о фигуре на игровом поле.
@@ -207,7 +207,7 @@ void checkCollisionForMovingDown(GameInfo_t game_info, bool *collision);
  *       о фигуре, что означает, что состояние будет сохраняться между
  *       вызовами функции.
  */
-FigureInfo *getFigureInfo(GameInfo_t game_info, int type);
+FigureInfo *GetFigureInfo(GameInfo_t game_info, int type);
 
 /**
  * @brief Получает координаты фигуры.
@@ -219,14 +219,14 @@ FigureInfo *getFigureInfo(GameInfo_t game_info, int type);
  * Ищет по полю пока не найдет достаточное количество блоков фигуры. Количество
  * зависит от типа фигуры и в каком она находится положении.
  */
-void getCoorFigure(GameInfo_t game_info, FigureInfo *figure_info);
+void GetCoorFigure(GameInfo_t game_info, FigureInfo *figure_info);
 
 /**
  * @brief Проверяет мешает ли край поля поворачивать фигуру или нет.
  * @param figure_info Структура содержащая информацию о фигуре.
  * @return Возращает edge = true если край поля иначе false.
  */
-bool checkEdgeForRotate(FigureInfo figure_info);
+bool CheckEdgeForRotate(FigureInfo figure_info);
 
 /**
  * @brief Проверяет мешают ли другие фигуры поворачивать текущую фигуру или нет.
@@ -235,35 +235,35 @@ bool checkEdgeForRotate(FigureInfo figure_info);
  * фигуры.
  * @return Возращает collision = true если другие фигуры мешают иначе false.
  */
-bool checkCollisionForRotate(FigureInfo figure_info, GameInfo_t game_info);
+bool CheckCollisionForRotate(FigureInfo figure_info, GameInfo_t game_info);
 
 /**
  * @brief Поворачивает фигуру на поле.
  * @param figure_info Структура содержащая информацию о фигуре.
  * @param game_info Структура содержащая информацию об игре включая поле.
  */
-void rotateTetramino(FigureInfo *figure_info, GameInfo_t *game_info);
+void RotateTetramino(FigureInfo *figure_info, GameInfo_t *game_info);
 
 /**
  * @brief Поворачивает фигуру I на поле.
  * @param figure_info Структура содержащая информацию о фигуре.
  * @param game_info Структура содержащая информацию об игре включая поле.
  */
-void rotateFigureI(FigureInfo *figure_info, GameInfo_t *game_info);
+void RotateFigureI(FigureInfo *figure_info, GameInfo_t *game_info);
 
 /**
  * @brief Поворачивает фигуру Г, L или T на поле.
  * @param figure_info Структура содержащая информацию о фигуре.
  * @param game_info Структура содержащая информацию об игре включая поле.
  */
-void rotateFigureGLT(FigureInfo *figure_info, GameInfo_t *game_info);
+void RotateFigureGLT(FigureInfo *figure_info, GameInfo_t *game_info);
 
 /**
  * @brief Поворачивает фигуру S или Z на поле.
  * @param figure_info Структура содержащая информацию о фигуре.
  * @param game_info Структура содержащая информацию об игре включая поле.
  */
-void rotateFigureSZ(FigureInfo *figure_info, GameInfo_t *game_info);
+void RotateFigureSZ(FigureInfo *figure_info, GameInfo_t *game_info);
 
 /**
  * @brief Реализует конечный автомат и переход из одного состояния игры в
@@ -271,7 +271,7 @@ void rotateFigureSZ(FigureInfo *figure_info, GameInfo_t *game_info);
  * @param game_info Структура содержащая информацию об игре.
  * @return Возращает текущее состояние игры.
  */
-FieldFsm fsmField(GameInfo_t *game_info);
+FieldState FsmField(GameInfo_t *game_info);
 
 /**
  * @brief Реализует состояние игры StartGame.
@@ -282,14 +282,14 @@ FieldFsm fsmField(GameInfo_t *game_info);
  *
  * @return Возвращает следующее состояние игры Spawn.
  */
-FieldFsm fsmStartGame(GameInfo_t *game_info);
+FieldState FsmStartGame(GameInfo_t *game_info);
 
 /**
  * @brief Записывает в матрицу next следующую фигуру.
  * @param game_info Структура содержащая информацию об игре.
  * @param tetromino Индекс фигуры которую следует записать.
  */
-void nextTetromino(GameInfo_t *game_info, int tetromino);
+void NextTetromino(GameInfo_t *game_info, int tetromino);
 
 /**
  * @brief Реализует состояние игры Spawn.
@@ -301,7 +301,7 @@ void nextTetromino(GameInfo_t *game_info, int tetromino);
  * @return Возвращает следующее состояние игры Shift при возможности нарисовать
  * новую фигуру и GameOver в противном случае.
  */
-FieldFsm fsmSpawn(GameInfo_t *game_info);
+FieldState FsmSpawn(GameInfo_t *game_info);
 
 /**
  * @brief Проверяет можно ли нарисовать новую фигуру на поле или там есть
@@ -312,7 +312,7 @@ FieldFsm fsmSpawn(GameInfo_t *game_info);
  * @return Возвращает количество блоков которые нельзя отрисовать, если хотя бы
  * один есть фигуру нельзя отрисовать.
  */
-int checkSpawnPossibility(GameInfo_t game_info, int *real_spawn);
+int CheckSpawnPossibility(GameInfo_t game_info, int *real_spawn);
 
 /**
  * @brief Реализует состояние игры Shfit.
@@ -321,7 +321,7 @@ int checkSpawnPossibility(GameInfo_t game_info, int *real_spawn);
  * @return Возвращает следующее состояние игры - Shift если фигура сдвинулась
  * вниз и Attaching если не может сдвинуться.
  */
-FieldFsm fsmShift(GameInfo_t *game_info, FigureInfo *figure_info);
+FieldState FsmShift(GameInfo_t *game_info, FigureInfo *figure_info);
 
 /**
  * @brief Реализует состояние игры Attaching.
@@ -333,14 +333,14 @@ FieldFsm fsmShift(GameInfo_t *game_info, FigureInfo *figure_info);
  *
  * @return Возвращает следующее состояние игры Spawn.
  */
-FieldFsm fsmAttaching(GameInfo_t *game_info);
+FieldState FsmAttaching(GameInfo_t *game_info);
 
 /**
  * @brief Стирает линию и сдвигает все остальное поле вниз.
  * @param game_info Структура содержащая информацию об игре.
  * @param i Координата строки которую нужно стереть.
  */
-void erasingLine(GameInfo_t *game_info, int i);
+void ErasingLine(GameInfo_t *game_info, int i);
 
 /**
  * @brief Реализует состояние игры GameOver.
@@ -351,7 +351,7 @@ void erasingLine(GameInfo_t *game_info, int i);
  *
  * @return Возвращает следующее состояние игры Start.
  */
-FieldFsm fsmGameOver(GameInfo_t *game_info);
+FieldState FsmGameOver(GameInfo_t *game_info);
 #ifdef __cplusplus
 }
 #endif

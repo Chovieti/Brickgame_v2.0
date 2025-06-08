@@ -77,12 +77,12 @@ extern "C" {
  * @note Функция должна быть вызвана перед использованием других функций
  * библиотеки ncurses.
  */
-void setupNcurses();
+void SetupNcurses();
 
 /**
  * @brief Считывает нажатие от пользователя и передает его в функцию userInput.
  */
-UserAction_t readInput();
+UserAction_t ReadInput();
 
 /**
  * @brief Отрисовывает весь экран игры.
@@ -94,41 +94,41 @@ UserAction_t readInput();
  * -Поле следующей фигуры
  * -Поле статистики
  */
-void drawField(GameInfo_t game_info);
+void DrawField(GameInfo_t game_info);
 
 /**
  * @brief Отрисовывает границы игрового поля.
  */
-void drawFieldBorder();
+void DrawFieldBorder();
 
 /**
  * @brief Отрисовывает игровое поле.
  * @param game_info Структура содержащая информацию об игре.
  */
-void drawGameField(GameInfo_t game_info);
+void DrawGameField(GameInfo_t game_info);
 
 /**
  * @brief Отрисовывает поле показываюшее следующую фигуру.
  * @param game_info Структура содержащая информацию об игре.
  */
-void drawNextFigure(GameInfo_t game_info);
+void DrawNextFigure(GameInfo_t game_info);
 
 /**
  * @brief Отрисовывает окно статистики.
  * @param game_info Структура содержащая информацию об игре.
  */
-void drawStatField(GameInfo_t game_info);
+void DrawStatField(GameInfo_t game_info);
 
 /**
  * @brief Отрисовывает экран завершения игры.
  * @param game_info Структура содержащая информацию об игре.
  */
-void drawGameOverScreen(GameInfo_t game_info);
+void DrawGameOverScreen(GameInfo_t game_info);
 
 /**
  * @brief Отрисовывает надпись начала игры.
  */
-void drawStartText();
+void DrawStartText();
 
 #ifdef __cplusplus
 }

@@ -20,14 +20,14 @@ int main() {
   std::cout << "Выберите игру:\n 1 - тетрис\n 2 - змейка" << std::endl;
   std::cin >> game;
   if (interface == 1 && game == 1) {
-    brickGameConsole(userInput, updateCurrentState);
+    BrickGameConsole(userInput, updateCurrentState);
   } else if (interface == 2 && game == 1) {
-    brickGameDescktop(userInput, updateCurrentState);
+    BrickGameDescktop(userInput, updateCurrentState);
   } else if (interface == 1 && game == 2) {
-    brickGameConsole(s21::SnakeAdapter::userInput,
+    BrickGameConsole(s21::SnakeAdapter::userInput,
                      s21::SnakeAdapter::updateCurrentState);
   } else if (interface == 2 && game == 2) {
-    brickGameDescktop(s21::SnakeAdapter::userInput,
+    BrickGameDescktop(s21::SnakeAdapter::userInput,
                       s21::SnakeAdapter::updateCurrentState);
   } else {
     std::cout << "Такого нету" << std::endl;
@@ -39,16 +39,16 @@ int main() {
  * @brief Движок всей игры включающий создание экрана с помощью ncurses и
  * последующую отрисовку в нем.
  */
-void brickGameConsole(void (*userInput)(UserAction_t, bool),
+void BrickGameConsole(void (*userInput)(UserAction_t, bool),
                       GameInfo_t (*updateCurrentState)()) {
-  setupNcurses();
+  SetupNcurses();
   GameInfo_t game_info = {0};
   while (true) {
-    userInput(readInput(), true);
+    userInput(ReadInput(), true);
     game_info = updateCurrentState();
     if (!game_info.field || !game_info.next) break;
     clear();
-    drawField(game_info);
+    DrawField(game_info);
     refresh();
     napms(20);
   }
@@ -56,12 +56,12 @@ void brickGameConsole(void (*userInput)(UserAction_t, bool),
   endwin();
 }
 
-int brickGameDescktop(void (*userInput)(UserAction_t, bool),
+int BrickGameDescktop(void (*userInput)(UserAction_t, bool),
                       GameInfo_t (*updateCurrentState)()) {
   char **argv = nullptr;
   int argc = 0;
   QApplication app(argc, argv);
-  GameWidget window(userInput, updateCurrentState);
+  s21::GameWidget window(userInput, updateCurrentState);
   window.setWindowTitle("BrickGameV2.0");
   window.setFixedSize(380, 420);
   window.show();

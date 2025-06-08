@@ -6,13 +6,13 @@
 extern "C" {
 #endif
 
-void brickGameConsole(void (*userInput)(UserAction_t, bool),
+void BrickGameConsole(void (*userInput)(UserAction_t, bool),
                       GameInfo_t (*updateCurrentState)());
 
 #ifdef __cplusplus
 }
 #endif
-int brickGameDescktop(void (*userInput)(UserAction_t, bool),
+int BrickGameDescktop(void (*userInput)(UserAction_t, bool),
                       GameInfo_t (*updateCurrentState)());
 
 #endif  // BRICKGAME_V2_0_BRICKGAME_H
