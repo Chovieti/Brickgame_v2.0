@@ -1,105 +1,137 @@
 #include "desktop_screen.h"
 
-// Кастомный виджет для отображения матрицы
-// Конструктор виджета
+#include <QApplication>
+#include <QKeyEvent>
+#include <QPainter>
+#include <QTimer>
+#include <QWidget>
+
+#include "../../inline.h"
+#include "../../lib_struct.h"
+
+namespace s21 {
+
 GameWidget::GameWidget(void (*userInput)(UserAction_t, bool),
                        GameInfo_t (*updateCurrentState)(), QWidget* parent)
     : QWidget(parent),
       userInput(userInput),
-      updateCurrentState(updateCurrentState) {
+      updateCurrentState(updateCurrentState),
+      game_info_{},
+      game_timer_{} {
   setFocusPolicy(Qt::StrongFocus);
-  connect(&gameTimer, &QTimer::timeout, this, &GameWidget::gameLoop);
-  gameTimer.start(50);
-  game_info.field = nullptr;
-  game_info.next = nullptr;
+  connect(&game_timer_, &QTimer::timeout, this, &GameWidget::GameLoop);
+  game_timer_.start(50);
+  game_info_.field = nullptr;
+  game_info_.next = nullptr;
 }
 
-// Переопределяем метод рисования виджета
 void GameWidget::paintEvent(QPaintEvent*) {
-  if (!game_info.field || !game_info.next) return;
+  if (!game_info_.field || !game_info_.next) return;
 
   static double game_speed_metric = 0.0;
-  if (game_info.speed > 0 && game_info.speed <= 100)
-    game_speed_metric = 100 / (120.0 - game_info.speed);
+  if (game_info_.speed >= kSpeedForStart && game_info_.speed <= kMaxSpeed) {
+    game_speed_metric = 100.0 / (kBaseGameDelay - game_info_.speed);
+  }
 
-  QPainter painter(this);  // Создаем объект для рисования
+  QPainter painter(this);
 
-  drawBackground(painter);
-  drawGameBorders(painter);
-  drawNextPieceSection(painter);
-  drawStatsSection(painter, game_speed_metric);
-  drawGameField(painter);
-  drawSpecialScreens(painter);
+  DrawBackground(painter);
+  DrawGameBorders(painter);
+  DrawNextPieceSection(painter);
+  DrawStatsSection(painter, game_speed_metric);
+  DrawGameField(painter);
+  DrawSpecialScreens(painter);
 }
 
-void GameWidget::drawBackground(QPainter& painter) {
+void GameWidget::DrawBackground(QPainter& painter) const {
   painter.fillRect(rect(), Qt::black);
 }
 
-void GameWidget::drawGameBorders(QPainter& painter) {
+void GameWidget::DrawGameBorders(QPainter& painter) const {
   painter.setPen(QPen(Qt::white, 2));
   painter.setBrush(Qt::NoBrush);
   // Основное игровое поле
-  painter.drawRect(10, 10, 200, 400);
+  painter.drawRect(kBorderOffset, kBorderOffset, kPixelScale * kWidth,
+                   kPixelScale * kHeight);
   // Статистика (верхний блок)
-  painter.drawRect(220, 10, 150, 150);
+  painter.drawRect((kPixelScale * kWidth + (2 * kBorderOffset)), kBorderOffset,
+                   kStatFieldSize, kStatFieldSize);
   // Статистика (нижний блок)
-  painter.drawRect(220, 160, 150, 250);
+  painter.drawRect((kPixelScale * kWidth + (2 * kBorderOffset)),
+                   kStatFieldSize + kBorderOffset, kStatFieldSize,
+                   kPixelScale * kHeight - kStatFieldSize);
 }
 
-void GameWidget::drawNextPieceSection(QPainter& painter) {
+void GameWidget::DrawNextPieceSection(QPainter& painter) const {
   painter.setFont(QFont("Verdana", 20));
   painter.drawText(270, 40, "NEXT");
-  for (int y = 0; y < 4; y++) {
-    for (int x = 0; x < 4; x++) {
-      if (game_info.next[y][x]) {
-        painter.fillRect((x * 20) + 255, (y * 20) + 55, 20, 20, Qt::white);
+  for (int y = kStartPoint; y < kNextSize; y++) {
+    for (int x = kStartPoint; x < kNextSize; x++) {
+      if (game_info_.next[y][x]) {
+        painter.fillRect((x * kPixelScale) + kNextBorderOffsetX,
+                         (y * kPixelScale) + kNextBorderOffsetY, kPixelScale,
+                         kPixelScale, Qt::white);
       }
     }
   }
 }
 
-void GameWidget::drawStatsSection(QPainter& painter, double game_speed_metric) {
+void GameWidget::DrawStatsSection(QPainter& painter,
+                                  double game_speed_metric) const {
   painter.setFont(QFont("Verdana", 18));
-  painter.drawText(230, 200,
+  painter.drawText(kStatTextStartX, kStatTextStartY,
                    QString("Speed: %1").arg(game_speed_metric, 0, 'f', 4));
-  painter.drawText(230, 236, QString("Level: %1").arg(game_info.level));
-  painter.drawText(230, 272, QString("Score: %1").arg(game_info.score));
+  painter.drawText(kStatTextStartX, kStatTextStartY + kStatTextIndetY,
+                   QString("Level: %1").arg(game_info_.level));
+  painter.drawText(kStatTextStartX, kStatTextStartY + kStatTextIndetY * 2,
+                   QString("Score: %1").arg(game_info_.score));
 
-  const int highScore = (game_info.high_score > game_info.score)
-                            ? game_info.high_score
-                            : game_info.score;
-  painter.drawText(230, 308, QString("High: %1").arg(highScore));
+  const int displayed_score = (game_info_.high_score > game_info_.score)
+                                  ? game_info_.high_score
+                                  : game_info_.score;
+  painter.drawText(kStatTextStartX, kStatTextStartY + kStatTextIndetY * 3,
+                   QString("High: %1").arg(displayed_score));
 
-  const QString pauseStatus = game_info.pause ? "Pause: ON" : "Pause: OFF";
-  painter.drawText(230, 344, pauseStatus);
+  const QString pause_status = game_info_.pause ? "Pause: ON" : "Pause: OFF";
+  painter.drawText(kStatTextStartX, kStatTextStartY + kStatTextIndetY * 4,
+                   pause_status);
 }
 
-void GameWidget::drawGameField(QPainter& painter) {
-  for (int y = 0; y < 20; y++) {
-    for (int x = 0; x < 10; x++) {
-      if (game_info.field[y][x]) {
-        painter.fillRect((x * 20) + 10, (y * 20) + 10, 20, 20, Qt::white);
+void GameWidget::DrawGameField(QPainter& painter) const {
+  for (int y = kStartPoint; y < kHeight; y++) {
+    for (int x = kStartPoint; x < kWidth; x++) {
+      if (game_info_.field[y][x]) {
+        painter.fillRect((x * kPixelScale) + kBorderOffset,
+                         (y * kPixelScale) + kBorderOffset, kPixelScale,
+                         kPixelScale, Qt::white);
       }
     }
   }
 }
 
-void GameWidget::drawSpecialScreens(QPainter& painter) {
-  if (game_info.speed == 0) {
-    painter.drawText(65, 210, QString("Press Enter"));
-  } else if (game_info.speed == -1) {
+void GameWidget::DrawSpecialScreens(QPainter& painter) const {
+  if (game_info_.speed == 0) {
+    painter.drawText(kEnterTextStartX, kEnterTextStartY,
+                     QString("Press Enter"));
+  } else if (game_info_.speed == kGameOverSpeed) {
     // Экран поражения
-    painter.fillRect(30, 110, 160, 200, Qt::black);
-    painter.drawRect(30, 110, 160, 200);
-    painter.drawText(70, 160, QString("You Lose"));
-    painter.drawText(60, 200, QString("Your Score"));
-    painter.drawText(65, 240, QString("%1").arg(game_info.score, 8));
-  } else if (game_info.speed == 200) {
+    painter.fillRect(kSharedScreenStartX, kLoseScreenStartY, kSharedScreenSizeX,
+                     kLoseScreenSizeY, Qt::black);
+    painter.drawRect(kSharedScreenStartX, kLoseScreenStartY, kSharedScreenSizeX,
+                     kLoseScreenSizeY);
+    painter.drawText(kLoseTextStartX + kLoseTextIndetX, kLoseTextStartY,
+                     QString("You Lose"));
+    painter.drawText(kLoseTextStartX - kLoseTextIndetX,
+                     kLoseTextStartY + kLoseTextIndentY, QString("Your Score"));
+    painter.drawText(kLoseTextStartX, kLoseTextStartY + kLoseTextIndentY * 2,
+                     QString("%1").arg(game_info_.score, 8));
+  } else if (game_info_.speed == kWinSpeed) {
     // Экран победы
-    painter.fillRect(30, 130, 160, 80, Qt::black);
-    painter.drawRect(30, 130, 160, 80);
-    painter.drawText(70, 170, QString("You Win!"));
+    painter.fillRect(kSharedScreenStartX, kWinScreenStartY, kSharedScreenSizeX,
+                     kWinScreenSizeY, Qt::black);
+    painter.drawRect(kSharedScreenStartX, kWinScreenStartY, kSharedScreenSizeX,
+                     kWinScreenSizeY);
+    painter.drawText(kWinTextStartX, kWinTextStartY, QString("You Win!"));
   }
 }
 
@@ -150,12 +182,15 @@ void GameWidget::keyPressEvent(QKeyEvent* event) {
   if (action == Terminate) QApplication::quit();
 }
 
-void GameWidget::gameLoop() {
-  game_info = updateCurrentState();
-  if (!game_info.field || !game_info.next) {
-    gameTimer.stop();
+void GameWidget::GameLoop() {
+  if (!updateCurrentState) return;
+  game_info_ = updateCurrentState();
+  if (!game_info_.field || !game_info_.next) {
+    game_timer_.stop();
     this->close();
     return;
   }
   update();
 }
+
+}  // namespace s21

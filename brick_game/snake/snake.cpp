@@ -16,7 +16,9 @@ SnakeModel::SnakeModel()
   game_info_.next = new int *[kNextSize];
   for (int i = kStartPoint; i < kHeight; ++i) {
     game_info_.field[i] = new int[kWidth]();
-    if (i < kNextSize) game_info_.next[i] = new int[kNextSize]();
+  }
+  for (int i = kStartPoint; i < kNextSize; ++i) {
+    game_info_.next[i] = new int[kNextSize]();
   }
 }
 

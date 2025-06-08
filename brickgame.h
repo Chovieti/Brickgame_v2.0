@@ -6,6 +6,10 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Движок всей игры включающий создание экрана с помощью ncurses и
+ * последующую отрисовку в нем.
+ */
 void BrickGameConsole(void (*userInput)(UserAction_t, bool),
                       GameInfo_t (*updateCurrentState)());
 

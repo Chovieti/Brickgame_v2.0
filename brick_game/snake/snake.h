@@ -4,27 +4,14 @@
 #include <deque>
 #include <random>
 
+#include "../../inline.h"
 #include "../../lib_struct.h"
 
 namespace s21 {
 
-inline constexpr int kStartPoint = 0;
-inline constexpr int kHeight = 20;
-inline constexpr int kWidth = 10;
-inline constexpr int kNextSize = 4;
-
 inline constexpr int kSpeedMult = 10;
 inline constexpr int kScoreForLevelUp = 5;
-
 inline constexpr int kMaxLevel = 10;
-inline constexpr int kMaxSpeed = 100;
-
-inline constexpr int kSpeedForStart = 1;
-inline constexpr int kWinSpeed = 200;
-inline constexpr int kGameOverSpeed = -1;
-
-inline constexpr int kBaseGameDelay = 120;
-
 inline constexpr int kEmptyPoint = 0;
 inline constexpr int kSnakePoint = 1;
 inline constexpr int kApplePoint = 2;
@@ -59,17 +46,17 @@ class SnakeModel {
     int y;
   };
 
-  struct SnakeInfo_t {
+  struct SnakeInfo {
     std::deque<SegmentCoor> body;
     SnakeDirection real_direction;
     SnakeDirection next_direction;
     bool speed_boost = false;
-    SegmentCoor GetHead() { return body.front(); }
-    SegmentCoor GetTail() { return body.back(); }
+    SegmentCoor GetHead() const { return body.front(); }
+    SegmentCoor GetTail() const { return body.back(); }
   };
 
   GameInfo_t game_info_;
-  SnakeInfo_t snake_info_;
+  SnakeInfo snake_info_;
   FieldState game_state_;
 
   // Методы для расчета времени
@@ -92,8 +79,6 @@ class SnakeModel {
   // Сохранение и чтение рекорда
   void ReadScore();
   void SaveScore();
-
-  FieldState GetGameState() const { return game_state_; };
 };
 
 class SnakeController {
