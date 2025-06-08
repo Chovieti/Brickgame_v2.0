@@ -1,5 +1,5 @@
-#ifndef USER_SCREEN_H
-#define USER_SCREEN_H
+#ifndef BRICKGAME_V2_0_GUI_CLI_USER_SCREEN_H
+#define BRICKGAME_V2_0_GUI_CLI_USER_SCREEN_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -7,7 +7,7 @@ extern "C" {
 
 #include <ncurses.h>
 
-#include "lib_spec.h"
+#include "../../lib_struct.h"
 
 /**
  * @brief Отступ всех полей от края экрана.
@@ -61,20 +61,77 @@ extern "C" {
  */
 #define Y_TEXT_START 11
 
-// void brickGame();
+/**
+ * @brief Инициализирует библиотеку ncurses для работы с интерфейсом.
+ *
+ * Эта функция настраивает режим работы ncurses, включая:
+ * - Включение режима кода управления (cbreak), который позволяет
+ *   программе реагировать на ввод символов мгновенно, без необходимости
+ * ожидания нажатия клавиши Enter.
+ * - Отключение отображения вводимых символов на экране (noecho).
+ * - Активирование клавиатурного ввода для специальных клавиш (keypad).
+ * - Установка режима не блокирующего ввода (nodelay), позволяющего программе
+ * продолжать выполнение, даже если на клавиатуре нет ввода.
+ * - Скрытие курсора (curs_set).
+ *
+ * @note Функция должна быть вызвана перед использованием других функций
+ * библиотеки ncurses.
+ */
 void setupNcurses();
-// void readInput();
+
+/**
+ * @brief Считывает нажатие от пользователя и передает его в функцию userInput.
+ */
 UserAction_t readInput();
+
+/**
+ * @brief Отрисовывает весь экран игры.
+ * @param game_info Структура содержащая информацию об игре.
+ *
+ * Содержит в себе функции отрисовки разных частей игры:
+ * -Границы полей
+ * -Игровое поле
+ * -Поле следующей фигуры
+ * -Поле статистики
+ */
 void drawField(GameInfo_t game_info);
+
+/**
+ * @brief Отрисовывает границы игрового поля.
+ */
 void drawFieldBorder();
+
+/**
+ * @brief Отрисовывает игровое поле.
+ * @param game_info Структура содержащая информацию об игре.
+ */
 void drawGameField(GameInfo_t game_info);
+
+/**
+ * @brief Отрисовывает поле показываюшее следующую фигуру.
+ * @param game_info Структура содержащая информацию об игре.
+ */
 void drawNextFigure(GameInfo_t game_info);
+
+/**
+ * @brief Отрисовывает окно статистики.
+ * @param game_info Структура содержащая информацию об игре.
+ */
 void drawStatField(GameInfo_t game_info);
+
+/**
+ * @brief Отрисовывает экран завершения игры.
+ * @param game_info Структура содержащая информацию об игре.
+ */
 void drawGameOverScreen(GameInfo_t game_info);
+
+/**
+ * @brief Отрисовывает надпись начала игры.
+ */
 void drawStartText();
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif  // BRICKGAME_V2_0_GUI_CLI_USER_SCREEN_H

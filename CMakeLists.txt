@@ -15,11 +15,8 @@ find_package(Curses REQUIRED)
 
 # Основная программа (C++)
 add_executable(BrickGameV2.0 
-    brickgame.cpp
-    # brickgame_console.cpp
+    brickgame.cc
     brick_game/tetris/tetris.c
-    brick_game/tetris/txtscore.c
-    brick_game/tetris/lib_spec.c
     brick_game/snake/snake.cpp
     gui/cli/user_screen.c
     gui/desktop/desktop_screen.cpp

@@ -1,5 +1,6 @@
-#ifndef LIB_STRUCT_H
-#define LIB_STRUCT_H
+#ifndef BRICKGAME_V2_0_LIB_STRUCT_H
+#define BRICKGAME_V2_0_LIB_STRUCT_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -40,4 +41,4 @@ typedef struct {
 #ifdef __cplusplus
 }
 #endif
-#endif
+#endif  // BRICKGAME_V2_0_LIB_STRUCT_H

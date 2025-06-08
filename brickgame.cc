@@ -1,5 +1,17 @@
 #include "brickgame.h"
 
+#include <iostream>
+
+#include "brick_game/snake/snake.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "brick_game/tetris/tetris.h"
+#include "gui/cli/user_screen.h"
+#ifdef __cplusplus
+}
+#endif
+
 int main() {
   int interface = 0, game = 0;
   std::cout << "Выберите интерфейс:\n 1 - Терминал\n 2 - Приложение"
@@ -17,8 +29,9 @@ int main() {
   } else if (interface == 2 && game == 2) {
     brickGameDescktop(s21::SnakeAdapter::userInput,
                       s21::SnakeAdapter::updateCurrentState);
-  } else
+  } else {
     std::cout << "Такого нету" << std::endl;
+  }
   return 0;
 }
 
@@ -48,8 +61,6 @@ int brickGameDescktop(void (*userInput)(UserAction_t, bool),
   char **argv = nullptr;
   int argc = 0;
   QApplication app(argc, argv);
-
-  // Главное окно
   GameWidget window(userInput, updateCurrentState);
   window.setWindowTitle("BrickGameV2.0");
   window.setFixedSize(380, 420);

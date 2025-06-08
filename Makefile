@@ -6,9 +6,7 @@ TEST_DIR = tests
 TEST_RUNNER = tests/build/test_runner
 #  brickgame.cpp
 SRC_CONSOLE = gui/cli/user_screen.c
-SRC_TETRIS = brick_game/tetris/tetris.c \
-				brick_game/tetris/lib_spec.c \
-				brick_game/tetris/txtscore.c
+SRC_TETRIS = brick_game/tetris/tetris.c
 
 DIST_DIR = dist
 DIST_NAME = brick_game_v1.0.tar.gz
