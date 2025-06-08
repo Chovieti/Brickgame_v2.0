@@ -1,48 +1,57 @@
-#ifndef SNAKE_H
-#define SNAKE_H
-#define HEIGHT 20
-#define WEIGHT 10
-#define NEXT_SIZE 4
+#ifndef BRICKGAME_V2_0_BRICK_GAME_SNAKE_SNAKE_H
+#define BRICKGAME_V2_0_BRICK_GAME_SNAKE_SNAKE_H
 
-#include <chrono>
 #include <deque>
-#include <fstream>
 #include <random>
-#include <sstream>
 
 #include "../../lib_struct.h"
 
 namespace s21 {
 
-typedef enum { UP, RIGHT, DOWN, LEFT } SnakeDirection;
+inline constexpr int kStartPoint = 0;
+inline constexpr int kHeight = 20;
+inline constexpr int kWidth = 10;
+inline constexpr int kNextSize = 4;
 
-typedef enum { Start_Game, Spawn, Movement, Win, Game_Over } field_fsm;
+inline constexpr int kSpeedMult = 10;
+inline constexpr int kScoreForLevelUp = 5;
 
-class Snake_Model {
+inline constexpr int kMaxLevel = 10;
+inline constexpr int kMaxSpeed = 100;
+
+inline constexpr int kSpeedForStart = 1;
+inline constexpr int kWinSpeed = 200;
+inline constexpr int kGameOverSpeed = -1;
+
+inline constexpr int kBaseGameDelay = 120;
+
+inline constexpr int kEmptyPoint = 0;
+inline constexpr int kSnakePoint = 1;
+inline constexpr int kApplePoint = 2;
+
+enum class SnakeDirection { kUp, kRight, kDown, kLeft };
+
+enum class FieldState { kStartGame, kSpawn, kMovement, kWin, kGameOver };
+
+class SnakeModel {
  public:
-  Snake_Model();
-  ~Snake_Model();
+  SnakeModel();
+  ~SnakeModel();
 
-  GameInfo_t updateCurrentState();
-  // Методы доступа к полям модели для контроллера
-  GameInfo_t getGameInfo() const;
-  GameInfo_t updateInfo();
-  bool shouldUpdate(std::chrono::milliseconds elapsed_time) const;
-  int calculateUpdateThreshold() const;
-
-  void setDirection(SnakeDirection direction);
-  SnakeDirection getDirection() const;
-  void setSpeedBoost();
-  bool getSpeedBoost() const;
-  void setGameSpeed();
-  int getGameSpeed() const;
-  void setGamePause(int set);
-  int getGamePause() const;
-  field_fsm getGameState() const;
-  bool isMovementState() const;
-  bool isActive() const;
+  // Методы для контроллера
+  bool ShouldUpdate(std::chrono::milliseconds elapsed_time) const;
+  GameInfo_t UpdateInfo();
+  GameInfo_t GetGameInfo() const { return game_info_; };
+  // Методы для доступа к модели
+  void SetDirection(SnakeDirection direction);
+  SnakeDirection GetDirection() const;
+  void SetSpeedBoost() { snake_info_.speed_boost = true; }
+  void SetGameSpeed() { game_info_.speed = kSpeedForStart; }
+  int GetGameSpeed() const { return game_info_.speed; }
+  void SetGamePause(int set) { game_info_.pause = set; }
+  int GetGamePause() const { return game_info_.pause; }
   // Очистка матриц
-  void clearMatrix();
+  void ClearMatrix();
 
  private:
   struct SegmentCoor {
@@ -54,48 +63,54 @@ class Snake_Model {
     std::deque<SegmentCoor> body;
     SnakeDirection real_direction;
     SnakeDirection next_direction;
-    bool speed_boost_ = false;
-    SegmentCoor getHead() { return body.front(); }
-    SegmentCoor getTail() { return body.back(); }
+    bool speed_boost = false;
+    SegmentCoor GetHead() { return body.front(); }
+    SegmentCoor GetTail() { return body.back(); }
   };
 
-  GameInfo_t game_info;
-  SnakeInfo_t snake_info;
-  field_fsm game_state;
+  GameInfo_t game_info_;
+  SnakeInfo_t snake_info_;
+  FieldState game_state_;
 
-  // Добавление и удаление змейки на поле
-  void addSnakeOnField();
-  void removeSnakeOnField();
-  void spawnNewGameSnake();
-
-  bool checkCollision(SegmentCoor head);
+  // Методы для расчета времени
+  int CalculateUpdateThreshold() const;
+  bool IsMovementState() const;
+  bool IsActive() const;
   // Методы FSM
-  void FSMField();
-  field_fsm FSMStartGame();
-  field_fsm FSMSpawn(std::mt19937& generator);
-  field_fsm FSMMovement();
-  field_fsm FSMWin();
-  field_fsm FSMGameOver();
+  void FsmField();
+  FieldState FsmStartGame();
+  FieldState FsmSpawn(std::mt19937& generator);
+  FieldState FsmMovement();
+  FieldState FsmWin();
+  FieldState FsmGameOver();
+  // Добавление и удаление змейки на поле
+  void AddSnakeOnField();
+  void RemoveSnakeOnField();
+  void SpawnNewGameSnake();
+  // Проверка на столкновение
+  bool CheckCollision(SegmentCoor head);
   // Сохранение и чтение рекорда
-  void readScore();
-  void saveScore();
+  void ReadScore();
+  void SaveScore();
+
+  FieldState GetGameState() const { return game_state_; };
 };
 
-class Snake_Controller {
+class SnakeController {
  public:
-  Snake_Controller() = default;
-  ~Snake_Controller() = default;
+  SnakeController() = default;
+  ~SnakeController() = default;
 
   void userInput(UserAction_t action, bool hold);
 
   GameInfo_t updateCurrentState();
 
  private:
-  Snake_Model snake_model_for_controller;
+  SnakeModel snake_model_for_controller;
 };
 
 namespace SnakeAdapter {
-static Snake_Controller controller;
+static SnakeController controller;
 
 void userInput(UserAction_t action, bool hold);
 
@@ -104,4 +119,4 @@ GameInfo_t updateCurrentState();
 
 }  // namespace s21
 
-#endif
+#endif  // BRICKGAME_V2_0_BRICK_GAME_SNAKE_SNAKE_H
