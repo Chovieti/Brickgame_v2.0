@@ -1,6 +1,7 @@
 #ifndef BRICKGAME_V2_0_BRICK_GAME_SNAKE_SNAKE_H
 #define BRICKGAME_V2_0_BRICK_GAME_SNAKE_SNAKE_H
 
+#include <chrono>
 #include <deque>
 #include <random>
 
@@ -32,15 +33,12 @@ class SnakeModel {
   // Методы для доступа к модели
   void SetDirection(SnakeDirection direction);
   SnakeDirection GetDirection() const;
-  void SetSpeedBoost() { snake_info_.speed_boost = true; }
-  void SetGameSpeed() { game_info_.speed = kSpeedForStart; }
-  int GetGameSpeed() const { return game_info_.speed; }
-  void SetGamePause(int set) { game_info_.pause = set; }
-  int GetGamePause() const { return game_info_.pause; }
+  void SetSpeedBoost();
+  void SetGameSpeed();
+  void SetGamePause();
   // Очистка матриц
   void ClearMatrix();
 
- private:
   struct SegmentCoor {
     int x;
     int y;
@@ -55,14 +53,18 @@ class SnakeModel {
     SegmentCoor GetTail() const { return body.back(); }
   };
 
+ private:
   GameInfo_t game_info_;
   SnakeInfo snake_info_;
   FieldState game_state_;
+  friend class SnakeTester;
 
   // Методы для расчета времени
   int CalculateUpdateThreshold() const;
   bool IsMovementState() const;
   bool IsActive() const;
+  // Проверка смены направлений
+  bool CanChangeDirection(SnakeDirection direction);
   // Методы FSM
   void FsmField();
   FieldState FsmStartGame();

@@ -11,7 +11,7 @@
 namespace s21 {
 
 SnakeModel::SnakeModel()
-    : game_state_(FieldState::kStartGame), game_info_{}, snake_info_{} {
+    : game_info_{}, snake_info_{}, game_state_(FieldState::kStartGame) {
   game_info_.field = new int *[kHeight];
   game_info_.next = new int *[kNextSize];
   for (int i = kStartPoint; i < kHeight; ++i) {
@@ -29,7 +29,9 @@ SnakeModel::~SnakeModel() {
 
 bool SnakeModel::ShouldUpdate(std::chrono::milliseconds elapsed_time) const {
   if (!IsActive()) return false;
-  if (snake_info_.speed_boost || !IsMovementState()) return true;
+  if (snake_info_.speed_boost || !IsMovementState() ||
+      game_info_.speed == kSpeedForStart)
+    return true;
   return elapsed_time.count() >= CalculateUpdateThreshold();
 }
 
@@ -54,10 +56,43 @@ GameInfo_t SnakeModel::UpdateInfo() {
 }
 
 void SnakeModel::SetDirection(SnakeDirection direction) {
-  snake_info_.next_direction = direction;
+  if (SnakeModel::CanChangeDirection(direction))
+    snake_info_.next_direction = direction;
 }
+
+bool SnakeModel::CanChangeDirection(SnakeDirection direction) {
+  return (direction == SnakeDirection::kUp &&
+          snake_info_.real_direction != SnakeDirection::kDown) ||
+         (direction == SnakeDirection::kRight &&
+          snake_info_.real_direction != SnakeDirection::kLeft) ||
+         (direction == SnakeDirection::kDown &&
+          snake_info_.real_direction != SnakeDirection::kUp) ||
+         (direction == SnakeDirection::kLeft &&
+          snake_info_.real_direction != SnakeDirection::kRight);
+}
+
 SnakeDirection SnakeModel::GetDirection() const {
   return snake_info_.real_direction;
+}
+
+void SnakeModel::SetSpeedBoost() {
+  if (!game_info_.pause) snake_info_.speed_boost = true;
+}
+
+void SnakeModel::SetGameSpeed() {
+  if (game_info_.pause || game_info_.speed < kSpeedForStart ||
+      game_info_.speed > kMaxSpeed) {
+    game_info_.speed = kSpeedForStart;
+    game_info_.pause = 0;
+  }
+}
+
+void SnakeModel::SetGamePause() {
+  if (!game_info_.pause && game_info_.speed >= kSpeedForStart) {
+    game_info_.pause = 1;
+  } else {
+    game_info_.pause = 0;
+  }
 }
 
 void SnakeModel::ClearMatrix() {
@@ -255,45 +290,26 @@ void SnakeModel::SaveScore() {
 }
 
 void SnakeController::userInput(UserAction_t action, bool hold) {
-  SnakeDirection realDirection = snake_model_for_controller.GetDirection();
-  if (action == Up && hold == true &&
-      (realDirection == SnakeDirection::kRight ||
-       realDirection == SnakeDirection::kLeft)) {
+  if (action == Up && hold == true) {
     snake_model_for_controller.SetDirection(SnakeDirection::kUp);
   }
-  if (action == Right && hold == true &&
-      (realDirection == SnakeDirection::kUp ||
-       realDirection == SnakeDirection::kDown)) {
+  if (action == Right && hold == true) {
     snake_model_for_controller.SetDirection(SnakeDirection::kRight);
   }
-  if (action == Down && hold == true &&
-      (realDirection == SnakeDirection::kRight ||
-       realDirection == SnakeDirection::kLeft)) {
+  if (action == Down && hold == true) {
     snake_model_for_controller.SetDirection(SnakeDirection::kDown);
   }
-  if (action == Left && hold == true &&
-      (realDirection == SnakeDirection::kUp ||
-       realDirection == SnakeDirection::kDown)) {
+  if (action == Left && hold == true) {
     snake_model_for_controller.SetDirection(SnakeDirection::kLeft);
   }
-  if (action == Action && hold == true &&
-      !snake_model_for_controller.GetGamePause()) {
+  if (action == Action && hold == true) {
     snake_model_for_controller.SetSpeedBoost();
   }
   if (action == Pause && hold == true) {
-    if (!snake_model_for_controller.GetGamePause() &&
-        snake_model_for_controller.GetGameSpeed() >= kSpeedForStart) {
-      snake_model_for_controller.SetGamePause(true);
-    } else {
-      snake_model_for_controller.SetGamePause(false);
-    }
+    snake_model_for_controller.SetGamePause();
   }
-  if (action == Start && hold == true &&
-      (snake_model_for_controller.GetGamePause() ||
-       snake_model_for_controller.GetGameSpeed() < kSpeedForStart ||
-       snake_model_for_controller.GetGameSpeed() > kMaxSpeed)) {
+  if (action == Start && hold == true) {
     snake_model_for_controller.SetGameSpeed();
-    snake_model_for_controller.SetGamePause(false);
   }
   if (action == Terminate && hold == true) {
     snake_model_for_controller.ClearMatrix();
@@ -312,12 +328,14 @@ GameInfo_t SnakeController::updateCurrentState() {
   return snake_model_for_controller.GetGameInfo();
 }
 
-void SnakeAdapter::userInput(UserAction_t action, bool hold) {
+namespace SnakeAdapter {
+
+void userInput(UserAction_t action, bool hold) {
   controller.userInput(action, hold);
 }
 
-GameInfo_t SnakeAdapter::updateCurrentState() {
-  return controller.updateCurrentState();
-}
+GameInfo_t updateCurrentState() { return controller.updateCurrentState(); }
+
+}  // namespace SnakeAdapter
 
 }  // namespace s21
