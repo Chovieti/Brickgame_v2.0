@@ -35,17 +35,17 @@ bool SnakeModel::ShouldUpdate(std::chrono::milliseconds elapsed_time) const {
   return elapsed_time.count() >= CalculateUpdateThreshold();
 }
 
-bool SnakeModel::IsActive() const {
-  return game_info_.speed >= kSpeedForStart && game_info_.speed <= kMaxSpeed &&
-         !game_info_.pause;
+int SnakeModel::CalculateUpdateThreshold() const {
+  return (kBaseGameDelay - game_info_.speed) * kSpeedMult;
 }
 
 bool SnakeModel::IsMovementState() const {
   return game_state_ == FieldState::kMovement;
 }
 
-int SnakeModel::CalculateUpdateThreshold() const {
-  return (kBaseGameDelay - game_info_.speed) * kSpeedMult;
+bool SnakeModel::IsActive() const {
+  return game_info_.speed >= kSpeedForStart && game_info_.speed <= kMaxSpeed &&
+         !game_info_.pause;
 }
 
 GameInfo_t SnakeModel::UpdateInfo() {
