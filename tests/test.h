@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../headers/tetris.h"
+#include "../brick_game/tetris/tetris.h"
 
 Suite *tetris_test_suite();
 

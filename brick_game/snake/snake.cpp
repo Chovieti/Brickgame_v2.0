@@ -71,10 +71,6 @@ bool SnakeModel::CanChangeDirection(SnakeDirection direction) {
           snake_info_.real_direction != SnakeDirection::kRight);
 }
 
-SnakeDirection SnakeModel::GetDirection() const {
-  return snake_info_.real_direction;
-}
-
 void SnakeModel::SetSpeedBoost() {
   if (!game_info_.pause) snake_info_.speed_boost = true;
 }
@@ -178,6 +174,7 @@ FieldState SnakeModel::FsmStartGame() {
 }
 
 FieldState SnakeModel::FsmSpawn(std::mt19937 &generator) {
+  if (snake_info_.body.size() == kHeight * kWidth) return FieldState::kWin;
   std::uniform_int_distribution<> distr_x(kStartPoint, kWidth - 1);
   std::uniform_int_distribution<> distr_y(kStartPoint, kHeight - 1);
   int x = 0, y = 0;
@@ -224,7 +221,6 @@ FieldState SnakeModel::FsmMovement() {
   } else {
     state = FieldState::kGameOver;
   }
-  if (snake_info_.body.size() == kHeight * kWidth) state = FieldState::kWin;
   return state;
 }
 
@@ -260,7 +256,7 @@ bool SnakeModel::CheckCollision(SegmentCoor head) {
 
 FieldState SnakeModel::FsmWin() {
   game_info_.speed = kWinSpeed;
-  SaveScore();
+  if (game_info_.score >= game_info_.high_score) SaveScore();
   return FieldState::kStartGame;
 }
 

@@ -32,7 +32,6 @@ class SnakeModel {
   GameInfo_t GetGameInfo() const { return game_info_; };
   // Методы для доступа к модели
   void SetDirection(SnakeDirection direction);
-  SnakeDirection GetDirection() const;
   void SetSpeedBoost();
   void SetGameSpeed();
   void SetGamePause();

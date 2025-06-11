@@ -1,6 +1,9 @@
 CC = clang
 FLAGS_CPP = -Wall -Wextra -std=c++20
 FLAGS_C = -Wall -Wextra -std=c11
+
+TEST_CPP_FLAGS = -lgtest -lgtest_main
+
 CURSES_FLAG =  -lncurses
 TEST_DIR = tests
 TEST_RUNNER = tests/build/test_runner
@@ -29,6 +32,53 @@ endif
 # TODO: dvi
 
 all: play
+
+.PHONY: snake_test snake_gcov snake_gcov+
+
+# Расширенный Gcovr отчет
+snake_gcov+: gcov_build
+	mkdir -p $(OUTPUT_DIR)
+	gcovr -r . \
+		--exclude 'tests/build/' \
+		--exclude 'tests/' \
+		--exclude '.*/gtest/.*' \
+		--html-details \
+		--print-summary \
+		--html-title "Snake Game Coverage Report" \
+		--html-theme blue \
+		--exclude-unreachable-branches \
+		--exclude-throw-branches \
+		--decisions \
+		-o $(OUTPUT_DIR)/gcovr_report.html
+
+# Gcovr отчет
+snake_gcov: gcov_build
+	mkdir -p $(OUTPUT_DIR)
+	gcovr -e 'tests/build/*' --html $(OUTPUT_DIR)/gcovr_report.html
+# Собирает тесты с файлами покрытия
+gcov_build: gcov_snake.a tests/snake_test.cc
+	mkdir -p tests/build
+	g++ $(FLAGS_CPP) tests/snake_test.cc gcov_snake.a -fprofile-arcs -ftest-coverage $(TEST_CPP_FLAGS) -lpthread -o tests/build/snake_test
+	./tests/build/snake_test
+# Собирает библиотеку змейки с флагами покрытия
+gcov_snake.a: brick_game/snake/snake.cpp
+	g++ $(FLAGS_CPP) -fprofile-arcs -ftest-coverage -c brick_game/snake/snake.cpp
+	ar rcs $@ *.o
+	rm -rf *.o
+
+# Запускает тесты
+snake_test: tests/build/snake_test
+	./tests/build/snake_test
+# Собирает тесты
+tests/build/snake_test:	snake.a $(TEST_DIR)/snake_test.cc
+	mkdir -p tests/build
+	g++ $(TEST_DIR)/snake_test.cc snake.a $(TEST_CPP_FLAGS) $(FLAGS_CPP) -o $@
+# Собирает библиотеку змейки
+snake.a: brick_game/snake/snake.cpp
+	g++ $(FLAGS_CPP) -c brick_game/snake/snake.cpp
+	ar rcs $@ *.o
+	rm -rf *.o
+
 
 play: install
 	$(BUILD_DIR)/BrickGameV2.0
