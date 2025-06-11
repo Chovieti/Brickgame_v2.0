@@ -267,10 +267,10 @@ END_TEST
 
 START_TEST(tetris_fsmSpawn_true) {
   GameInfo_t* test_GameInfo = GetGameInfo_t(false);
-  nextTetromino(test_GameInfo, kFIGURE1);
+  NextTetromino(test_GameInfo, kFIGURE1);
   GetFigureInfo(*test_GameInfo, 1);
   FieldState test_field_fsm = 0;
-  test_field_fsm = fsmSpawn(test_GameInfo);
+  test_field_fsm = FsmSpawn(test_GameInfo);
   int count_block = 0;
   for (int j = 0; j < 10; j++) {
     if (test_GameInfo->field[0][j] == 1) count_block++;
@@ -283,13 +283,13 @@ END_TEST
 
 START_TEST(tetris_fsmSpawn_false) {
   GameInfo_t* test_GameInfo = GetGameInfo_t(false);
-  nextTetromino(test_GameInfo, kFIGURE1);
+  NextTetromino(test_GameInfo, kFIGURE1);
   GetFigureInfo(*test_GameInfo, 1);
   FieldState test_field_fsm = 0;
   for (int j = 0; j < 10; j++) {
     test_GameInfo->field[0][j] = 2;
   }
-  test_field_fsm = fsmSpawn(test_GameInfo);
+  test_field_fsm = FsmSpawn(test_GameInfo);
   int count_block = 0;
   for (int j = 0; j < 10; j++) {
     if (test_GameInfo->field[0][j] == 1) count_block++;
@@ -314,7 +314,7 @@ START_TEST(tetris_fsmShift) {
   test_FigureInfo->moving = true;
   test_FigureInfo->coor_x = 1;
   test_FigureInfo->coor_y = -1;
-  test_field_fsm = fsmShift(test_GameInfo, test_FigureInfo);
+  test_field_fsm = FsmShift(test_GameInfo, test_FigureInfo);
   for (int j = 1; j < 5; j++) {
     ck_assert_int_eq(0, test_GameInfo->field[0][j]);
     ck_assert_int_eq(1, test_GameInfo->field[1][j]);
@@ -338,7 +338,7 @@ START_TEST(tetris_fsmShift_five_times) {
   test_FigureInfo->coor_x = 1;
   test_FigureInfo->coor_y = -1;
   for (int i = 1; i <= 5; i++) {
-    test_field_fsm = fsmShift(test_GameInfo, test_FigureInfo);
+    test_field_fsm = FsmShift(test_GameInfo, test_FigureInfo);
     test_FigureInfo->coor_y++;
     for (int j = 1; j < 5; j++) {
       ck_assert_int_eq(0, test_GameInfo->field[i - 1][j]);
@@ -364,7 +364,7 @@ START_TEST(tetris_fsmShift_stop) {
   test_FigureInfo->moving = true;
   test_FigureInfo->coor_x = 1;
   test_FigureInfo->coor_y = -1;
-  test_field_fsm = fsmShift(test_GameInfo, test_FigureInfo);
+  test_field_fsm = FsmShift(test_GameInfo, test_FigureInfo);
   for (int j = 1; j < 5; j++) {
     ck_assert_int_eq(1, test_GameInfo->field[0][j]);
   }
@@ -377,7 +377,7 @@ START_TEST(tetristetris_fsmGameOver) {
   GameInfo_t* test_GameInfo = GetGameInfo_t(false);
   test_GameInfo->score = 100;
   test_GameInfo->high_score = 0;
-  int result = fsmGameOver(test_GameInfo);
+  int result = FsmGameOver(test_GameInfo);
   GetGameInfo_t(false);
   ck_assert_int_eq(-1, test_GameInfo->speed);
   test_GameInfo->speed = 0;
@@ -444,7 +444,7 @@ START_TEST(tetris_fsmAttaching_for_zero_line) {
   ck_assert_int_eq(0, test_GameInfo->score);
   ck_assert_int_eq(0, test_GameInfo->speed);
 
-  FieldState test_field_fsm = fsmAttaching(test_GameInfo);
+  FieldState test_field_fsm = FsmAttaching(test_GameInfo);
 
   ck_assert_int_eq(kSpawn, test_field_fsm);
   ck_assert_int_eq(1, test_GameInfo->level);
@@ -466,7 +466,7 @@ START_TEST(tetris_fsmAttaching_for_one_line) {
   ck_assert_int_eq(0, test_GameInfo->score);
   ck_assert_int_eq(0, test_GameInfo->speed);
 
-  FieldState test_field_fsm = fsmAttaching(test_GameInfo);
+  FieldState test_field_fsm = FsmAttaching(test_GameInfo);
 
   ck_assert_int_eq(kSpawn, test_field_fsm);
   ck_assert_int_eq(1, test_GameInfo->level);
@@ -489,7 +489,7 @@ START_TEST(tetris_fsmAttaching_for_two_line) {
   ck_assert_int_eq(0, test_GameInfo->score);
   ck_assert_int_eq(0, test_GameInfo->speed);
 
-  FieldState test_field_fsm = fsmAttaching(test_GameInfo);
+  FieldState test_field_fsm = FsmAttaching(test_GameInfo);
 
   ck_assert_int_eq(kSpawn, test_field_fsm);
   ck_assert_int_eq(1, test_GameInfo->level);
@@ -513,7 +513,7 @@ START_TEST(tetris_fsmAttaching_for_three_line) {
   ck_assert_int_eq(0, test_GameInfo->score);
   ck_assert_int_eq(0, test_GameInfo->speed);
 
-  FieldState test_field_fsm = fsmAttaching(test_GameInfo);
+  FieldState test_field_fsm = FsmAttaching(test_GameInfo);
 
   ck_assert_int_eq(kSpawn, test_field_fsm);
   ck_assert_int_eq(2, test_GameInfo->level);
@@ -538,7 +538,7 @@ START_TEST(tetris_fsmAttaching_for_four_line) {
   ck_assert_int_eq(0, test_GameInfo->score);
   ck_assert_int_eq(0, test_GameInfo->speed);
 
-  FieldState test_field_fsm = fsmAttaching(test_GameInfo);
+  FieldState test_field_fsm = FsmAttaching(test_GameInfo);
 
   ck_assert_int_eq(kSpawn, test_field_fsm);
   ck_assert_int_eq(3, test_GameInfo->level);
@@ -561,13 +561,13 @@ START_TEST(tetris_rotate_I_figure) {
   test_GameInfo->field[4][6] = 1;
   test_FigureInfo->coor_x = 3;
   test_FigureInfo->coor_y = 3;
-  rotateTetramino(test_FigureInfo, test_GameInfo);
+  RotateTetramino(test_FigureInfo, test_GameInfo);
   ck_assert_int_eq(1, test_FigureInfo->type_figure);
   ck_assert_int_eq(1, test_FigureInfo->type_position);
   for (int i = 3; i < 7; i++) {
     ck_assert_int_eq(1, test_GameInfo->field[i][4]);
   }
-  rotateTetramino(test_FigureInfo, test_GameInfo);
+  RotateTetramino(test_FigureInfo, test_GameInfo);
   ck_assert_int_eq(1, test_FigureInfo->type_figure);
   ck_assert_int_eq(0, test_FigureInfo->type_position);
   for (int j = 3; j < 7; j++) {
@@ -593,7 +593,7 @@ START_TEST(tetris_rotate_G_figure) {
   test_GameInfo->field[6][3] = 1;
   test_FigureInfo->coor_x = 2;
   test_FigureInfo->coor_y = 4;
-  rotateTetramino(test_FigureInfo, test_GameInfo);
+  RotateTetramino(test_FigureInfo, test_GameInfo);
   ck_assert_int_eq(2, test_FigureInfo->type_figure);
   ck_assert_int_eq(0, test_FigureInfo->type_position);
 
@@ -621,7 +621,7 @@ START_TEST(tetris_rotate_L_figure) {
   test_GameInfo->field[6][3] = 1;
   test_FigureInfo->coor_x = 2;
   test_FigureInfo->coor_y = 4;
-  rotateTetramino(test_FigureInfo, test_GameInfo);
+  RotateTetramino(test_FigureInfo, test_GameInfo);
   ck_assert_int_eq(3, test_FigureInfo->type_figure);
   ck_assert_int_eq(1, test_FigureInfo->type_position);
 
@@ -649,7 +649,7 @@ START_TEST(tetris_rotate_T_figure) {
   test_GameInfo->field[4][3] = 1;
   test_FigureInfo->coor_x = 2;
   test_FigureInfo->coor_y = 4;
-  rotateTetramino(test_FigureInfo, test_GameInfo);
+  RotateTetramino(test_FigureInfo, test_GameInfo);
   ck_assert_int_eq(6, test_FigureInfo->type_figure);
   ck_assert_int_eq(0, test_FigureInfo->type_position);
 
@@ -677,7 +677,7 @@ START_TEST(tetris_rotate_S_figure) {
   test_GameInfo->field[6][3] = 1;
   test_FigureInfo->coor_x = 2;
   test_FigureInfo->coor_y = 3;
-  rotateTetramino(test_FigureInfo, test_GameInfo);
+  RotateTetramino(test_FigureInfo, test_GameInfo);
   ck_assert_int_eq(5, test_FigureInfo->type_figure);
   ck_assert_int_eq(1, test_FigureInfo->type_position);
 
@@ -686,7 +686,7 @@ START_TEST(tetris_rotate_S_figure) {
   ck_assert_int_eq(1, test_GameInfo->field[5][3]);
   ck_assert_int_eq(1, test_GameInfo->field[5][2]);
 
-  rotateTetramino(test_FigureInfo, test_GameInfo);
+  RotateTetramino(test_FigureInfo, test_GameInfo);
   ck_assert_int_eq(5, test_FigureInfo->type_figure);
   ck_assert_int_eq(0, test_FigureInfo->type_position);
 
@@ -714,7 +714,7 @@ START_TEST(tetris_rotate_Z_figure) {
   test_GameInfo->field[5][4] = 1;
   test_FigureInfo->coor_x = 2;
   test_FigureInfo->coor_y = 3;
-  rotateTetramino(test_FigureInfo, test_GameInfo);
+  RotateTetramino(test_FigureInfo, test_GameInfo);
   ck_assert_int_eq(7, test_FigureInfo->type_figure);
   ck_assert_int_eq(1, test_FigureInfo->type_position);
 
@@ -723,7 +723,7 @@ START_TEST(tetris_rotate_Z_figure) {
   ck_assert_int_eq(1, test_GameInfo->field[4][3]);
   ck_assert_int_eq(1, test_GameInfo->field[5][3]);
 
-  rotateTetramino(test_FigureInfo, test_GameInfo);
+  RotateTetramino(test_FigureInfo, test_GameInfo);
   ck_assert_int_eq(7, test_FigureInfo->type_figure);
   ck_assert_int_eq(0, test_FigureInfo->type_position);
 
@@ -746,25 +746,25 @@ START_TEST(tetris_edgeForRotate) {
   test_FigureInfo->type_figure = 1;
   test_FigureInfo->coor_x = 0;
   test_FigureInfo->coor_y = 4;
-  bool result = checkEdgeForRotate(*test_FigureInfo);
+  bool result = CheckEdgeForRotate(*test_FigureInfo);
   ck_assert_int_eq(0, result);
   test_FigureInfo->coor_x = -1;
-  result = checkEdgeForRotate(*test_FigureInfo);
+  result = CheckEdgeForRotate(*test_FigureInfo);
   ck_assert_int_eq(1, result);
   test_FigureInfo->coor_x = 8;
-  result = checkEdgeForRotate(*test_FigureInfo);
+  result = CheckEdgeForRotate(*test_FigureInfo);
   ck_assert_int_eq(1, result);
 
   test_FigureInfo->type_figure = 3;
   test_FigureInfo->coor_x = 0;
   test_FigureInfo->coor_y = 4;
-  result = checkEdgeForRotate(*test_FigureInfo);
+  result = CheckEdgeForRotate(*test_FigureInfo);
   ck_assert_int_eq(0, result);
   test_FigureInfo->coor_x = -1;
-  result = checkEdgeForRotate(*test_FigureInfo);
+  result = CheckEdgeForRotate(*test_FigureInfo);
   ck_assert_int_eq(1, result);
   test_FigureInfo->coor_x = 8;
-  result = checkEdgeForRotate(*test_FigureInfo);
+  result = CheckEdgeForRotate(*test_FigureInfo);
   ck_assert_int_eq(1, result);
   GetGameInfo_t(true);
 }
