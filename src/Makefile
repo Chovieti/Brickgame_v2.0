@@ -36,6 +36,9 @@ install: uninstall
 	cd build && cmake ..
 	$(MAKE) -C build
 
+play:  build/BrickGameV2.0 
+	./build/BrickGameV2.0 
+
 uninstall: 
 	rm -rf $(BUILD_DIR)
 	rm -rf *_score.txt
