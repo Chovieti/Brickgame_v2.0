@@ -107,8 +107,6 @@ make clean # очистка собранных файлов
 
 make uninstall # полная очистка проекта
 
-make lcov_report # отчет LCOV о покрытии кода
-
 make gcov_report # отчет GCOVR о покрытии кода
 ```
 
